@@ -1,7 +1,7 @@
-PKG=.
+PKGS=$(shell go list ./... | findstr /v "local")
 
 test:
-	go test -race -cover -count=1 "$(PKG)/..."
+	go test -race -cover -count=1 $(PKGS)
 
 test-v:
-	go test -v -race -cover -count=1 "$(PKG)/..."
+	go test -v -race -cover -count=1 $(PKGS)
