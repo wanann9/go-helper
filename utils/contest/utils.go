@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/emirpasic/gods/maps/treemap"
 	"github.com/emirpasic/gods/trees/binaryheap"
+	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/emirpasic/gods/utils"
 )
 
@@ -27,10 +27,7 @@ func _ternary(condition bool, a, b int) int {
 	return b
 }
 
-var (
-	prt = fmt.Println
-	prf = fmt.Printf
-)
+var prt, prf = fmt.Println, fmt.Printf
 
 func btw(a, l, r int) bool {
 	_assert(l <= r)
@@ -47,7 +44,10 @@ func in(a int, nums ...int) bool {
 }
 
 func s2i(s string, base int) int {
-	rst, _ := strconv.ParseInt(s, base, 64)
+	rst, err := strconv.ParseInt(s, base, 64)
+	if err != nil {
+		prt(err)
+	}
 	return int(rst)
 }
 
@@ -156,12 +156,12 @@ func lcm(a, b int) int {
 var cache [][]int
 
 //func init() {
-//	cache = mtx(1001, 1001, 0)
+//	cache = mtx(1001, 1001, -1)
 //}
 
 func c(n, k, mod int) (rst int) {
 	_assert(n > 0, btw(k, 0, n))
-	if cache[n][k] > 0 {
+	if cache[n][k] >= 0 {
 		return cache[n][k]
 	}
 	defer func() {
@@ -247,30 +247,34 @@ func cb(l1, l2, l3, init int) [][][]int {
 	return c
 }
 
-func push(a, item interface{}) {
+func cbBool(l1, l2, l3 int, init bool) [][][]bool {
+	c := make([][][]bool, l1)
+	for i := range c {
+		c[i] = mtxBool(l2, l3, init)
+	}
+	return c
+}
+
+func sz(a interface{}) (int, int) {
 	switch aa := a.(type) {
-	case *[]int:
-		*aa = append(*aa, item.(int))
-	case *[]int64:
-		*aa = append(*aa, item.(int64))
-	case *[]uint:
-		*aa = append(*aa, item.(uint))
-	case *[]uint64:
-		*aa = append(*aa, item.(uint64))
-	case *[]byte:
-		*aa = append(*aa, item.(byte))
-	case *[]rune:
-		*aa = append(*aa, item.(rune))
-	case *[]float64:
-		*aa = append(*aa, item.(float64))
-	case *[]bool:
-		*aa = append(*aa, item.(bool))
-	case *[]string:
-		*aa = append(*aa, item.(string))
-	case *[]pair:
-		*aa = append(*aa, item.(pair))
-	case *[]interface{}:
-		*aa = append(*aa, item)
+	case [][]int:
+		return len(aa), len(aa[0])
+	case [][]int64:
+		return len(aa), len(aa[0])
+	case [][]uint:
+		return len(aa), len(aa[0])
+	case [][]uint64:
+		return len(aa), len(aa[0])
+	case [][]byte:
+		return len(aa), len(aa[0])
+	case [][]rune:
+		return len(aa), len(aa[0])
+	case [][]float64:
+		return len(aa), len(aa[0])
+	case [][]bool:
+		return len(aa), len(aa[0])
+	case []string:
+		return len(aa), len(aa[0])
 	default:
 		panic(nil)
 	}
@@ -296,7 +300,7 @@ func pop(a interface{}) (rst interface{}) {
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
 	case *[]string:
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
-	case *[]pair:
+	case *[]vector:
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
 	case *[]interface{}:
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
@@ -326,7 +330,7 @@ func back(a interface{}) interface{} {
 		return aa[len(aa)-1]
 	case []string:
 		return aa[len(aa)-1]
-	case []pair:
+	case []vector:
 		return aa[len(aa)-1]
 	case []interface{}:
 		return aa[len(aa)-1]
@@ -337,49 +341,49 @@ func back(a interface{}) interface{} {
 
 func reverse(a interface{}) {
 	switch aa := a.(type) {
-	case *[]int:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []int:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]int64:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []int64:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]uint:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []uint:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]uint64:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []uint64:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]byte:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []byte:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]rune:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []rune:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]float64:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []float64:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]bool:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []bool:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]string:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []string:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]pair:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []vector:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
-	case *[]interface{}:
-		for i, j := 0, len(*aa)-1; i < j; i, j = i+1, j-1 {
-			(*aa)[i], (*aa)[j] = (*aa)[j], (*aa)[i]
+	case []interface{}:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
 		}
 	default:
 		panic(nil)
@@ -395,102 +399,75 @@ var (
 	runeComparator2    = func(a, b interface{}) int { return -utils.RuneComparator(a, b) }
 	float64Comparator2 = func(a, b interface{}) int { return -utils.Float64Comparator(a, b) }
 	stringComparator2  = func(a, b interface{}) int { return -utils.StringComparator(a, b) }
-	pairComparator2    = func(a, b interface{}) int { return -pairComparator(a, b) }
+	vectorComparator2  = func(a, b interface{}) int { return -vectorComparator(a, b) }
 )
 
 func srt(a interface{}, comparator utils.Comparator) {
+	sort.Slice(a, _less(a, comparator))
+}
+
+func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 	switch aa := a.(type) {
-	case *[]int:
-		sort.Sort(_sliceInt{aa, comparator})
-	case *[]int64:
-		sort.Sort(_sliceInt64{aa, comparator})
-	case *[]uint:
-		sort.Sort(_sliceUint{aa, comparator})
-	case *[]uint64:
-		sort.Sort(_sliceUint64{aa, comparator})
-	case *[]byte:
-		sort.Sort(_sliceByte{aa, comparator})
-	case *[]rune:
-		sort.Sort(_sliceRune{aa, comparator})
-	case *[]float64:
-		sort.Sort(_sliceFloat{aa, comparator})
-	case *[]string:
-		sort.Sort(_sliceString{aa, comparator})
-	case *[]pair:
-		sort.Sort(_slicePair{aa, comparator})
+	case []int:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []int64:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []uint:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []uint64:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []byte:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []rune:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []float64:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []string:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []vector:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []interface{}:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	default:
 		panic(nil)
 	}
 }
 
-type (
-	_sliceInt struct {
-		values     *[]int
-		comparator utils.Comparator
+func lb(l, r int, check func(int) bool) int {
+	_assert(l+1 < r)
+	for l+1 < r {
+		if m := l + (r-l)>>1; check(m) {
+			r = m
+		} else {
+			l = m
+		}
 	}
-	_sliceInt64 struct {
-		values     *[]int64
-		comparator utils.Comparator
-	}
-	_sliceUint struct {
-		values     *[]uint
-		comparator utils.Comparator
-	}
-	_sliceUint64 struct {
-		values     *[]uint64
-		comparator utils.Comparator
-	}
-	_sliceByte struct {
-		values     *[]byte
-		comparator utils.Comparator
-	}
-	_sliceRune struct {
-		values     *[]rune
-		comparator utils.Comparator
-	}
-	_sliceFloat struct {
-		values     *[]float64
-		comparator utils.Comparator
-	}
-	_sliceString struct {
-		values     *[]string
-		comparator utils.Comparator
-	}
-	_slicePair struct {
-		values     *[]pair
-		comparator utils.Comparator
-	}
-)
+	return r
+}
 
-func (s _sliceInt) Len() int              { return len(*s.values) }
-func (s _sliceInt) Swap(i, j int)         { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceInt) Less(i, j int) bool    { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceInt64) Len() int            { return len(*s.values) }
-func (s _sliceInt64) Swap(i, j int)       { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceInt64) Less(i, j int) bool  { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceUint) Len() int             { return len(*s.values) }
-func (s _sliceUint) Swap(i, j int)        { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceUint) Less(i, j int) bool   { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceUint64) Len() int           { return len(*s.values) }
-func (s _sliceUint64) Swap(i, j int)      { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceUint64) Less(i, j int) bool { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceByte) Len() int             { return len(*s.values) }
-func (s _sliceByte) Swap(i, j int)        { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceByte) Less(i, j int) bool   { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceRune) Len() int             { return len(*s.values) }
-func (s _sliceRune) Swap(i, j int)        { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceRune) Less(i, j int) bool   { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceFloat) Len() int            { return len(*s.values) }
-func (s _sliceFloat) Swap(i, j int)       { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceFloat) Less(i, j int) bool  { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _sliceString) Len() int           { return len(*s.values) }
-func (s _sliceString) Swap(i, j int)      { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _sliceString) Less(i, j int) bool { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
-func (s _slicePair) Len() int             { return len(*s.values) }
-func (s _slicePair) Swap(i, j int)        { (*s.values)[i], (*s.values)[j] = (*s.values)[j], (*s.values)[i] }
-func (s _slicePair) Less(i, j int) bool   { return s.comparator((*s.values)[i], (*s.values)[j]) < 0 }
+func ub(l, r int, check func(int) bool) int {
+	_assert(l+1 < r)
+	for l+1 < r {
+		if m := l + (r-l)>>1; check(m) {
+			l = m
+		} else {
+			r = m
+		}
+	}
+	return l
+}
 
 type vector []int
+
+var vectorComparator = func(a, b interface{}) int {
+	aa, bb := a.(vector), b.(vector)
+	for i := 0; i < min(len(aa), len(bb)); i++ {
+		if aa[i] != bb[i] {
+			return aa[i] - bb[i]
+		}
+	}
+	return len(aa) - len(bb)
+}
 
 func (v vector) max() int {
 	_assert(len(v) > 0)
@@ -543,74 +520,77 @@ func (t text) counts() map[rune]int {
 	return rst
 }
 
-type pair [2]int
-
-var pairComparator = func(a, b interface{}) int {
-	aa, bb := a.(pair), b.(pair)
-	return _ternary(aa[0] != bb[0], aa[0]-bb[0], aa[1]-bb[1])
-}
-
-func ug(n int, edges [][]int) ([][]pair, []int) {
-	g, d := make([][]pair, n), vct(n, 0)
+func ug(n int, edges [][]int) ([][]vector, []int) {
+	g, d := make([][]vector, n), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
 		if len(e) == 3 {
 			cost = e[2]
 		}
-		g[e[0]] = append(g[e[0]], pair{cost, e[1]})
-		g[e[1]] = append(g[e[1]], pair{cost, e[0]})
+		g[e[0]] = append(g[e[0]], vector{cost, e[1]})
+		g[e[1]] = append(g[e[1]], vector{cost, e[0]})
 		d[e[0]]++
 		d[e[1]]++
 	}
 	return g, d
 }
 
-func dg(n int, edges [][]int) ([][]pair, [][]pair, []int, []int) {
-	g, rg, id, od := make([][]pair, n), make([][]pair, n), vct(n, 0), vct(n, 0)
+func dg(n int, edges [][]int) ([][]vector, [][]vector, []int, []int) {
+	g, rg, id, od := make([][]vector, n), make([][]vector, n), vct(n, 0), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
 		if len(e) == 3 {
 			cost = e[2]
 		}
-		g[e[0]] = append(g[e[0]], pair{cost, e[1]})
-		rg[e[1]] = append(rg[e[1]], pair{cost, e[0]})
+		g[e[0]] = append(g[e[0]], vector{cost, e[1]})
+		rg[e[1]] = append(rg[e[1]], vector{cost, e[0]})
 		od[e[0]]++
 		id[e[1]]++
 	}
 	return g, rg, id, od
 }
 
-func dijkstra(n int, g [][]pair, src int) []int {
-	dist, visited, h := vct(n, -1), vctBool(n, false), hp(pairComparator)
+func child(n int, parent []int) [][]int {
+	rst := make([][]int, n)
+	for c, p := range parent {
+		if p >= 0 {
+			rst[p] = append(rst[p], c)
+		}
+	}
+	return rst
+}
+
+func dijkstra(n int, g [][]vector, src int) []int {
+	dist, visited, h := vct(n, -1), vctBool(n, false), hp(vectorComparator)
 	dist[src] = 0
-	h.Push(pair{0, src})
+	h.Push(vector{0, src})
 	for !h.Empty() {
-		peek := h.pop().(pair)
-		if visited[peek[1]] {
+		p := h.pop().(vector)
+		if visited[p[1]] {
 			continue
 		}
-		visited[peek[1]] = true
-		for _, e := range g[peek[1]] {
-			if d := dist[peek[1]] + e[0]; !btw(dist[e[1]], 0, d) {
+		visited[p[1]] = true
+		for _, e := range g[p[1]] {
+			if d := dist[p[1]] + e[0]; !btw(dist[e[1]], 0, d) {
 				dist[e[1]] = d
-				h.Push(pair{d, e[1]})
+				h.Push(vector{d, e[1]})
 			}
 		}
 	}
 	return dist
 }
 
-func tpSort(n int, g [][]pair, id []int) []int {
+func tpSort(n int, g [][]vector, id []int) []int {
 	rst := make([]int, 0, n)
 	for i, d := range id {
 		if d == 0 {
-			push(&rst, i)
+			rst = append(rst, i)
 		}
 	}
 	for i := 0; i < len(rst); i++ {
 		for _, e := range g[rst[i]] {
 			if id[e[1]]--; id[e[1]] == 0 {
-				push(&rst, e[1])
+				rst = append(rst, e[1])
 			}
 		}
 	}
@@ -637,12 +617,46 @@ func (h *heap) pop() interface{} {
 	return rst
 }
 
+type treeMap struct {
+	*redblacktree.Tree
+}
+
+func tm(comparator utils.Comparator) *treeMap {
+	return &treeMap{redblacktree.NewWith(comparator)}
+}
+
+func (m *treeMap) min() (interface{}, interface{}) {
+	_assert(!m.Empty())
+	node := m.Left()
+	return node.Key, node.Value
+}
+
+func (m *treeMap) max() (interface{}, interface{}) {
+	_assert(!m.Empty())
+	node := m.Right()
+	return node.Key, node.Value
+}
+
+func (m *treeMap) floor(x interface{}) (interface{}, interface{}) {
+	if node, found := m.Floor(x); found {
+		return node.Key, node.Value
+	}
+	return nil, nil
+}
+
+func (m *treeMap) ceiling(x interface{}) (interface{}, interface{}) {
+	if node, found := m.Ceiling(x); found {
+		return node.Key, node.Value
+	}
+	return nil, nil
+}
+
 type treeSet struct {
-	*treemap.Map
+	*treeMap
 }
 
 func ts(comparator utils.Comparator) *treeSet {
-	return &treeSet{treemap.NewWith(comparator)}
+	return &treeSet{tm(comparator)}
 }
 
 func (s *treeSet) add(items ...interface{}) {
@@ -671,29 +685,27 @@ func (s *treeSet) values() []interface{} {
 }
 
 func (s *treeSet) min() interface{} {
-	_assert(!s.Empty())
-	rst, _ := s.Min()
+	rst, _ := s.treeMap.min()
 	return rst
 }
 
 func (s *treeSet) max() interface{} {
-	_assert(!s.Empty())
-	rst, _ := s.Max()
+	rst, _ := s.treeMap.max()
 	return rst
 }
 
 func (s *treeSet) floor(x interface{}) interface{} {
-	rst, _ := s.Floor(x)
+	rst, _ := s.treeMap.floor(x)
 	return rst
 }
 
 func (s *treeSet) ceiling(x interface{}) interface{} {
-	rst, _ := s.Ceiling(x)
+	rst, _ := s.treeMap.ceiling(x)
 	return rst
 }
 
 type multiSet struct {
-	*treemap.Map
+	*treeSet
 	cnt map[interface{}]int
 }
 
@@ -702,7 +714,7 @@ type _pair struct {
 	idx int
 }
 
-func _wrapComparator(comparator utils.Comparator) utils.Comparator {
+func _comparator(comparator utils.Comparator) utils.Comparator {
 	return func(a, b interface{}) int {
 		aa, bb := a.(_pair), b.(_pair)
 		key := comparator(aa.val, bb.val)
@@ -712,14 +724,14 @@ func _wrapComparator(comparator utils.Comparator) utils.Comparator {
 
 func mts(comparator utils.Comparator) *multiSet {
 	return &multiSet{
-		Map: treemap.NewWith(_wrapComparator(comparator)),
-		cnt: make(map[interface{}]int),
+		treeSet: ts(_comparator(comparator)),
+		cnt:     make(map[interface{}]int),
 	}
 }
 
 func (s *multiSet) add(items ...interface{}) {
 	for _, item := range items {
-		s.Put(_pair{item, s.cnt[item]}, nil)
+		s.treeSet.add(_pair{item, s.cnt[item]})
 		s.cnt[item]++
 	}
 }
@@ -728,7 +740,7 @@ func (s *multiSet) remove(items ...interface{}) {
 	for _, item := range items {
 		if s.cnt[item] > 0 {
 			s.cnt[item]--
-			s.Remove(_pair{item, s.cnt[item]})
+			s.treeSet.remove(_pair{item, s.cnt[item]})
 		}
 	}
 }
@@ -743,38 +755,42 @@ func (s *multiSet) contains(items ...interface{}) bool {
 }
 
 func (s *multiSet) values() []interface{} {
-	values := s.Keys()
+	values := s.treeSet.values()
 	rst := make([]interface{}, 0, len(values))
 	for _, val := range values {
-		push(&rst, val.(_pair).val)
+		rst = append(rst, val.(_pair).val)
 	}
 	return rst
 }
 
 func (s *multiSet) min() interface{} {
-	_assert(!s.Empty())
-	rst, _ := s.Min()
-	return rst.(_pair).val
+	return s.treeSet.min().(_pair).val
 }
 
 func (s *multiSet) max() interface{} {
-	_assert(!s.Empty())
-	rst, _ := s.Max()
-	return rst.(_pair).val
+	return s.treeSet.max().(_pair).val
 }
 
 func (s *multiSet) floor(x interface{}) interface{} {
-	rst, _ := s.Floor(_pair{x, 0})
-	return rst.(_pair).val
+	if p := s.treeSet.floor(_pair{x, 0}); p != nil {
+		return p.(_pair).val
+	}
+	return nil
 }
 
 func (s *multiSet) ceiling(x interface{}) interface{} {
-	rst, _ := s.Ceiling(_pair{x, 0})
-	return rst.(_pair).val
+	if p := s.treeSet.ceiling(_pair{x, 0}); p != nil {
+		return p.(_pair).val
+	}
+	return nil
 }
 
 type deque struct {
 	*list.List
+}
+
+func dq() *deque {
+	return &deque{list.New()}
 }
 
 func (q *deque) popFront() interface{} {
