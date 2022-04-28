@@ -12,10 +12,10 @@ import (
 	"github.com/emirpasic/gods/utils"
 )
 
-func _assert(conditions ...bool) {
+func _assert(info interface{}, conditions ...bool) {
 	for _, condition := range conditions {
 		if !condition {
-			panic(nil)
+			panic(info)
 		}
 	}
 }
@@ -29,21 +29,7 @@ func _ternary(condition bool, a, b int) int {
 
 var prt, prf = fmt.Println, fmt.Printf
 
-func btw(a, l, r int) bool {
-	_assert(l <= r)
-	return a >= l && a <= r
-}
-
-func in(a int, nums ...int) bool {
-	for _, n := range nums {
-		if n == a {
-			return true
-		}
-	}
-	return false
-}
-
-func s2i(s string, base int) int {
+var s2i = func(s string, base int) int {
 	rst, err := strconv.ParseInt(s, base, 64)
 	if err != nil {
 		prt(err)
@@ -51,105 +37,99 @@ func s2i(s string, base int) int {
 	return int(rst)
 }
 
-func i2s(i, base int) string {
+var i2s = func(i, base int) string {
 	return strconv.FormatInt(int64(i), base)
 }
 
-func b2i(b bool) int {
+var b2i = func(b bool) int {
 	return _ternary(b, 1, 0)
 }
 
-func isNumber(a interface{}) bool {
+var isNumber = func(a interface{}) bool {
 	switch aa := a.(type) {
 	case byte:
 		return aa >= '0' && aa <= '9'
 	case rune:
 		return aa >= '0' && aa <= '9'
 	default:
-		panic(nil)
+		panic("isNumber")
 	}
 }
 
-func isLetter(a interface{}) bool {
+var isLetter = func(a interface{}) bool {
 	return isLower(a) || isUpper(a)
 }
 
-func isLower(a interface{}) bool {
+var isLower = func(a interface{}) bool {
 	switch aa := a.(type) {
 	case byte:
 		return aa >= 'a' && aa <= 'z'
 	case rune:
 		return aa >= 'a' && aa <= 'z'
 	default:
-		panic(nil)
+		panic("isLower")
 	}
 }
 
-func isUpper(a interface{}) bool {
+var isUpper = func(a interface{}) bool {
 	switch aa := a.(type) {
 	case byte:
 		return aa >= 'A' && aa <= 'Z'
 	case rune:
 		return aa >= 'A' && aa <= 'Z'
 	default:
-		panic(nil)
+		panic("isUpper")
 	}
 }
 
 const mod int = 1e9 + 7
 
-func abs(a int) int {
+var abs = func(a int) int {
 	return _ternary(a >= 0, a, -a)
 }
 
-func max(a, b int, nums ...int) int {
-	rst := _ternary(a >= b, a, b)
-	for _, n := range nums {
-		rst = _ternary(n > rst, n, rst)
-	}
-	return rst
-}
-
-func min(a, b int, nums ...int) int {
-	rst := _ternary(a <= b, a, b)
+var min = func(nums ...int) int {
+	_assert("min", len(nums) > 1)
+	rst := math.MaxInt
 	for _, n := range nums {
 		rst = _ternary(n < rst, n, rst)
 	}
 	return rst
 }
 
-func pow(a, b, mod int) (rst int) {
-	_assert(b >= 0, a != 0 || b != 0)
-	switch a {
-	case 0, 1:
-		return a
-	case -1:
-		return _ternary(b&1 == 0, 1, -1)
-	default:
-		for rst = 1; b > 0; b >>= 1 {
-			if b&1 != 0 {
-				if rst *= a; mod > 0 {
-					rst %= mod
-				}
-			}
-			if a *= a; mod > 0 {
-				a %= mod
+var max = func(nums ...int) int {
+	_assert("max", len(nums) > 1)
+	rst := math.MinInt
+	for _, n := range nums {
+		rst = _ternary(n > rst, n, rst)
+	}
+	return rst
+}
+
+var pow = func(a, b, mod int) (rst int) {
+	_assert("pow", b >= 0, a != 0 || b != 0)
+	for rst = 1; b > 0; b >>= 1 {
+		if b&1 != 0 {
+			if rst *= a; mod > 1 {
+				rst %= mod
 			}
 		}
-		return
+		if a *= a; mod > 1 {
+			a %= mod
+		}
 	}
+	return
 }
 
 func gcd(a, b int) int {
-	_assert(a > 0, b > 0)
+	_assert("gcd", a > 0, b > 0)
 	if a%b == 0 {
 		return b
 	}
 	return gcd(b, a%b)
 }
 
-func lcm(a, b int) int {
-	_assert(a > 0, b > 0)
+var lcm = func(a, b int) int {
 	return a / gcd(a, b) * b
 }
 
@@ -160,7 +140,7 @@ var cache [][]int
 //}
 
 func c(n, k, mod int) (rst int) {
-	_assert(n > 0, btw(k, 0, n))
+	_assert("c", n > 0, k >= 0, k <= n)
 	if cache[n][k] >= 0 {
 		return cache[n][k]
 	}
@@ -170,14 +150,14 @@ func c(n, k, mod int) (rst int) {
 	if k = _ternary(k > n>>1, n-k, k); k == 0 {
 		return 1
 	}
-	if rst = c(n-1, k-1, mod) + c(n-1, k, mod); mod > 0 {
+	if rst = c(n-1, k-1, mod) + c(n-1, k, mod); mod > 1 {
 		rst %= mod
 	}
 	return
 }
 
-func isPrime(n int) bool {
-	_assert(n >= 0)
+var isPrime = func(n int) bool {
+	_assert("isPrime", n >= 0)
 	if n <= 1 {
 		return false
 	}
@@ -189,8 +169,8 @@ func isPrime(n int) bool {
 	return true
 }
 
-func factor(n int) map[int]int {
-	_assert(n >= 0)
+var factor = func(n int) map[int]int {
+	_assert("factor", n >= 0)
 	rst := make(map[int]int)
 	for i := 2; i*i <= n; i++ {
 		for ; n%i == 0; n /= i {
@@ -203,7 +183,7 @@ func factor(n int) map[int]int {
 	return rst
 }
 
-func vct(l, init int) []int {
+var vct = func(l, init int) []int {
 	v := make([]int, l)
 	if init != 0 {
 		for i := range v {
@@ -213,7 +193,23 @@ func vct(l, init int) []int {
 	return v
 }
 
-func vctBool(l int, init bool) []bool {
+var mtx = func(l1, l2, init int) [][]int {
+	m := make([][]int, l1)
+	for i := range m {
+		m[i] = vct(l2, init)
+	}
+	return m
+}
+
+var cb = func(l1, l2, l3, init int) [][][]int {
+	c := make([][][]int, l1)
+	for i := range c {
+		c[i] = mtx(l2, l3, init)
+	}
+	return c
+}
+
+var vctBool = func(l int, init bool) []bool {
 	v := make([]bool, l)
 	if init {
 		for i := range v {
@@ -223,15 +219,7 @@ func vctBool(l int, init bool) []bool {
 	return v
 }
 
-func mtx(l1, l2, init int) [][]int {
-	m := make([][]int, l1)
-	for i := range m {
-		m[i] = vct(l2, init)
-	}
-	return m
-}
-
-func mtxBool(l1, l2 int, init bool) [][]bool {
+var mtxBool = func(l1, l2 int, init bool) [][]bool {
 	m := make([][]bool, l1)
 	for i := range m {
 		m[i] = vctBool(l2, init)
@@ -239,15 +227,7 @@ func mtxBool(l1, l2 int, init bool) [][]bool {
 	return m
 }
 
-func cb(l1, l2, l3, init int) [][][]int {
-	c := make([][][]int, l1)
-	for i := range c {
-		c[i] = mtx(l2, l3, init)
-	}
-	return c
-}
-
-func cbBool(l1, l2, l3 int, init bool) [][][]bool {
+var cbBool = func(l1, l2, l3 int, init bool) [][][]bool {
 	c := make([][][]bool, l1)
 	for i := range c {
 		c[i] = mtxBool(l2, l3, init)
@@ -255,7 +235,7 @@ func cbBool(l1, l2, l3 int, init bool) [][][]bool {
 	return c
 }
 
-func sz(a interface{}) (int, int) {
+var sz = func(a interface{}) (int, int) {
 	switch aa := a.(type) {
 	case [][]int:
 		return len(aa), len(aa[0])
@@ -273,14 +253,16 @@ func sz(a interface{}) (int, int) {
 		return len(aa), len(aa[0])
 	case [][]bool:
 		return len(aa), len(aa[0])
+	case [][]string:
+		return len(aa), len(aa[0])
 	case []string:
 		return len(aa), len(aa[0])
 	default:
-		panic(nil)
+		panic("sz")
 	}
 }
 
-func pop(a interface{}) (rst interface{}) {
+var pop = func(a interface{}) (rst interface{}) {
 	switch aa := a.(type) {
 	case *[]int:
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
@@ -305,12 +287,12 @@ func pop(a interface{}) (rst interface{}) {
 	case *[]interface{}:
 		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
 	default:
-		panic(nil)
+		panic("pop")
 	}
 	return
 }
 
-func back(a interface{}) interface{} {
+var back = func(a interface{}) interface{} {
 	switch aa := a.(type) {
 	case []int:
 		return aa[len(aa)-1]
@@ -335,11 +317,11 @@ func back(a interface{}) interface{} {
 	case []interface{}:
 		return aa[len(aa)-1]
 	default:
-		panic(nil)
+		panic("back")
 	}
 }
 
-func reverse(a interface{}) {
+var rvs = func(a interface{}) {
 	switch aa := a.(type) {
 	case []int:
 		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
@@ -386,23 +368,196 @@ func reverse(a interface{}) {
 			aa[i], aa[j] = aa[j], aa[i]
 		}
 	default:
-		panic(nil)
+		panic("rvs")
 	}
 }
 
-var (
-	intComparator2     = func(a, b interface{}) int { return -utils.IntComparator(a, b) }
-	int64Comparator2   = func(a, b interface{}) int { return -utils.Int64Comparator(a, b) }
-	uintComparator2    = func(a, b interface{}) int { return -utils.UIntComparator(a, b) }
-	uint64Comparator2  = func(a, b interface{}) int { return -utils.UInt64Comparator(a, b) }
-	byteComparator2    = func(a, b interface{}) int { return -utils.ByteComparator(a, b) }
-	runeComparator2    = func(a, b interface{}) int { return -utils.RuneComparator(a, b) }
-	float64Comparator2 = func(a, b interface{}) int { return -utils.Float64Comparator(a, b) }
-	stringComparator2  = func(a, b interface{}) int { return -utils.StringComparator(a, b) }
-	vectorComparator2  = func(a, b interface{}) int { return -vectorComparator(a, b) }
-)
+// int, int64, uint, uint64, byte, rune, float64, bool, string, vector
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []vector, []interface{}
+func cp(a interface{}) (rst interface{}) {
+	switch aa := a.(type) {
+	case int, int64, uint, uint64, byte, rune, float64, bool, string:
+		rst = a
+	case vector:
+		rst = vector(make([]int, len(aa)))
+		copy(rst.(vector), aa)
+	case []int:
+		rst = make([]int, len(aa))
+		copy(rst.([]int), aa)
+	case []int64:
+		rst = make([]int64, len(aa))
+		copy(rst.([]int64), aa)
+	case []uint:
+		rst = make([]uint, len(aa))
+		copy(rst.([]uint), aa)
+	case []uint64:
+		rst = make([]uint64, len(aa))
+		copy(rst.([]uint64), aa)
+	case []byte:
+		rst = make([]byte, len(aa))
+		copy(rst.([]byte), aa)
+	case []rune:
+		rst = make([]rune, len(aa))
+		copy(rst.([]rune), aa)
+	case []float64:
+		rst = make([]float64, len(aa))
+		copy(rst.([]float64), aa)
+	case []bool:
+		rst = make([]bool, len(aa))
+		copy(rst.([]bool), aa)
+	case []string:
+		rst = make([]string, len(aa))
+		copy(rst.([]string), aa)
+	case []vector:
+		rst = make([]vector, len(aa))
+		for i, item := range aa {
+			rst.([]vector)[i] = cp(item).(vector)
+		}
+	case []interface{}:
+		rst = make([]interface{}, len(aa))
+		for i, item := range aa {
+			rst.([]interface{})[i] = cp(item)
+		}
+	default:
+		panic("cp")
+	}
+	return
+}
 
-func srt(a interface{}, comparator utils.Comparator) {
+// int, int64, uint, uint64, byte, rune, float64, bool, string, vector
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []vector, []interface{}
+func cmp(a, b interface{}) int {
+	switch aa := a.(type) {
+	case int:
+		return utils.IntComparator(a, b)
+	case int64:
+		return utils.Int64Comparator(a, b)
+	case uint:
+		return utils.UIntComparator(a, b)
+	case uint64:
+		return utils.UInt64Comparator(a, b)
+	case byte:
+		return utils.ByteComparator(a, b)
+	case rune:
+		return utils.RuneComparator(a, b)
+	case float64:
+		return utils.Float64Comparator(a, b)
+	case bool:
+		return b2i(aa) - b2i(b.(bool))
+	case string:
+		return utils.StringComparator(a, b)
+	case vector:
+		bb := b.(vector)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []int:
+		bb := b.([]int)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []int64:
+		bb := b.([]int64)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []uint:
+		bb := b.([]uint)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []uint64:
+		bb := b.([]uint64)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []byte:
+		bb := b.([]byte)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []rune:
+		bb := b.([]rune)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []float64:
+		bb := b.([]float64)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []bool:
+		bb := b.([]bool)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []string:
+		bb := b.([]string)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []vector:
+		bb := b.([]int)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case []interface{}:
+		bb := b.([]interface{})
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	default:
+		panic("cmp")
+	}
+}
+
+// int, int64, uint, uint64, byte, rune, float64, bool, string, vector
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []vector, []interface{}
+var cmp2 = func(a, b interface{}) int {
+	return -cmp(a, b)
+}
+
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []vector, []interface{}
+var srt = func(a interface{}, comparator utils.Comparator) {
 	sort.Slice(a, _less(a, comparator))
 }
 
@@ -422,6 +577,8 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []float64:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []bool:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []string:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []vector:
@@ -429,12 +586,26 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 	case []interface{}:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	default:
-		panic(nil)
+		panic("_less")
 	}
 }
 
-func lb(l, r int, check func(int) bool) int {
-	_assert(l+1 < r)
+var fd = func(l, r, i int, check func(int) bool) int {
+	_assert("fd", l <= r, i != 0)
+	inc := 1
+	if i < 0 {
+		l, r, i, inc = r, l, -i, -1
+	}
+	for j := l; j != r+inc; j += inc {
+		if i -= b2i(check(j)); i == 0 {
+			return j
+		}
+	}
+	return -1
+}
+
+var lb = func(l, r int, check func(int) bool) int {
+	_assert("lb", l < r)
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			r = m
@@ -445,8 +616,8 @@ func lb(l, r int, check func(int) bool) int {
 	return r
 }
 
-func ub(l, r int, check func(int) bool) int {
-	_assert(l+1 < r)
+var ub = func(l, r int, check func(int) bool) int {
+	_assert("ub", l < r)
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			l = m
@@ -459,30 +630,20 @@ func ub(l, r int, check func(int) bool) int {
 
 type vector []int
 
-var vectorComparator = func(a, b interface{}) int {
-	aa, bb := a.(vector), b.(vector)
-	for i := 0; i < min(len(aa), len(bb)); i++ {
-		if aa[i] != bb[i] {
-			return aa[i] - bb[i]
-		}
-	}
-	return len(aa) - len(bb)
-}
-
-func (v vector) max() int {
-	_assert(len(v) > 0)
-	rst := math.MinInt64
+func (v vector) min() int {
+	_assert("vector_min", len(v) > 0)
+	rst := math.MaxInt
 	for _, n := range v {
-		rst = max(rst, n)
+		rst = min(rst, n)
 	}
 	return rst
 }
 
-func (v vector) min() int {
-	_assert(len(v) > 0)
-	rst := math.MaxInt64
+func (v vector) max() int {
+	_assert("vector_max", len(v) > 0)
+	rst := math.MinInt
 	for _, n := range v {
-		rst = min(rst, n)
+		rst = max(rst, n)
 	}
 	return rst
 }
@@ -496,8 +657,8 @@ func (v vector) sum() (rst int) {
 
 func (v vector) preSum() []int {
 	rst := vct(len(v)+1, 0)
-	for i := 1; i <= len(v); i++ {
-		rst[i] = rst[i-1] + v[i-1]
+	for i, n := range v {
+		rst[i+1] = rst[i] + n
 	}
 	return rst
 }
@@ -510,17 +671,38 @@ func (v vector) counts() map[int]int {
 	return rst
 }
 
-type text string
+type text []byte
 
-func (t text) counts() map[rune]int {
-	rst := make(map[rune]int, len(t))
+func (t text) counts() map[byte]int {
+	rst := make(map[byte]int, 256)
 	for _, c := range t {
 		rst[c]++
 	}
 	return rst
 }
 
-func ug(n int, edges [][]int) ([][]vector, []int) {
+var (
+	drt  = []vector{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
+	drt2 = []vector{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
+)
+
+var srd = func(m, n, i, j int, drt []vector) []vector {
+	_assert("srd", in(i, j, 0, 0, m-1, n-1))
+	rst := make([]vector, 0, len(drt))
+	for _, d := range drt {
+		if p := []int{i + d[0], j + d[1]}; in(p[0], p[1], 0, 0, m-1, n-1) {
+			rst = append(rst, p)
+		}
+	}
+	return rst
+}
+
+var in = func(i, j, x1, y1, x2, y2 int) bool {
+	_assert("in", x1 <= x2, y1 <= y2)
+	return i >= x1 && i <= x2 && j >= y1 && j <= y2
+}
+
+var ug = func(n int, edges [][]int) ([][]vector, []int) {
 	g, d := make([][]vector, n), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
@@ -535,7 +717,7 @@ func ug(n int, edges [][]int) ([][]vector, []int) {
 	return g, d
 }
 
-func dg(n int, edges [][]int) ([][]vector, [][]vector, []int, []int) {
+var dg = func(n int, edges [][]int) ([][]vector, [][]vector, []int, []int) {
 	g, rg, id, od := make([][]vector, n), make([][]vector, n), vct(n, 0), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
@@ -550,7 +732,7 @@ func dg(n int, edges [][]int) ([][]vector, [][]vector, []int, []int) {
 	return g, rg, id, od
 }
 
-func child(n int, parent []int) [][]int {
+var child = func(n int, parent []int) [][]int {
 	rst := make([][]int, n)
 	for c, p := range parent {
 		if p >= 0 {
@@ -560,18 +742,18 @@ func child(n int, parent []int) [][]int {
 	return rst
 }
 
-func dijkstra(n int, g [][]vector, src int) []int {
-	dist, visited, h := vct(n, -1), vctBool(n, false), hp(vectorComparator)
+var dijkstra = func(n int, g [][]vector, src int) []int {
+	dist, visited, h := vct(n, -1), vctBool(n, false), hp(cmp)
 	dist[src] = 0
 	h.Push(vector{0, src})
 	for !h.Empty() {
-		p := h.pop().(vector)
+		p := h.Pop().(vector)
 		if visited[p[1]] {
 			continue
 		}
 		visited[p[1]] = true
 		for _, e := range g[p[1]] {
-			if d := dist[p[1]] + e[0]; !btw(dist[e[1]], 0, d) {
+			if d := dist[p[1]] + e[0]; dist[e[1]] < 0 || dist[e[1]] > d {
 				dist[e[1]] = d
 				h.Push(vector{d, e[1]})
 			}
@@ -580,7 +762,7 @@ func dijkstra(n int, g [][]vector, src int) []int {
 	return dist
 }
 
-func tpSort(n int, g [][]vector, id []int) []int {
+var tpSort = func(n int, g [][]vector, id []int) []int {
 	rst := make([]int, 0, n)
 	for i, d := range id {
 		if d == 0 {
@@ -601,19 +783,19 @@ type heap struct {
 	*binaryheap.Heap
 }
 
-func hp(comparator utils.Comparator) *heap {
+var hp = func(comparator utils.Comparator) *heap {
 	return &heap{binaryheap.NewWith(comparator)}
 }
 
-func (h *heap) peek() interface{} {
-	_assert(!h.Empty())
-	rst, _ := h.Peek()
+func (h *heap) Pop() interface{} {
+	_assert("heap_Pop", !h.Empty())
+	rst, _ := h.Heap.Pop()
 	return rst
 }
 
-func (h *heap) pop() interface{} {
-	_assert(!h.Empty())
-	rst, _ := h.Pop()
+func (h *heap) Peek() interface{} {
+	_assert("heap_Peek", !h.Empty())
+	rst, _ := h.Heap.Peek()
 	return rst
 }
 
@@ -621,47 +803,41 @@ type treeMap struct {
 	*redblacktree.Tree
 }
 
-func tm(comparator utils.Comparator) *treeMap {
+var tm = func(comparator utils.Comparator) *treeMap {
 	return &treeMap{redblacktree.NewWith(comparator)}
 }
 
-func (m *treeMap) min() (interface{}, interface{}) {
-	_assert(!m.Empty())
-	node := m.Left()
-	return node.Key, node.Value
+func (m *treeMap) Left() *redblacktree.Node {
+	_assert("treeMap_Left", !m.Empty())
+	return m.Tree.Left()
 }
 
-func (m *treeMap) max() (interface{}, interface{}) {
-	_assert(!m.Empty())
-	node := m.Right()
-	return node.Key, node.Value
+func (m *treeMap) Right() *redblacktree.Node {
+	_assert("treeMap_Right", !m.Empty())
+	return m.Tree.Right()
 }
 
-func (m *treeMap) floor(x interface{}) (interface{}, interface{}) {
-	if node, found := m.Floor(x); found {
-		return node.Key, node.Value
-	}
-	return nil, nil
+func (m *treeMap) Floor(x interface{}) *redblacktree.Node {
+	rst, _ := m.Tree.Floor(x)
+	return rst
 }
 
-func (m *treeMap) ceiling(x interface{}) (interface{}, interface{}) {
-	if node, found := m.Ceiling(x); found {
-		return node.Key, node.Value
-	}
-	return nil, nil
+func (m *treeMap) Ceiling(x interface{}) *redblacktree.Node {
+	rst, _ := m.Tree.Ceiling(x)
+	return rst
 }
 
 type treeSet struct {
 	*treeMap
 }
 
-func ts(comparator utils.Comparator) *treeSet {
+var ts = func(comparator utils.Comparator) *treeSet {
 	return &treeSet{tm(comparator)}
 }
 
 func (s *treeSet) add(items ...interface{}) {
 	for _, item := range items {
-		s.Put(item, nil)
+		s.Put(item, struct{}{})
 	}
 }
 
@@ -680,28 +856,30 @@ func (s *treeSet) contains(items ...interface{}) bool {
 	return true
 }
 
-func (s *treeSet) values() []interface{} {
+func (s *treeSet) Values() []interface{} {
 	return s.Keys()
 }
 
 func (s *treeSet) min() interface{} {
-	rst, _ := s.treeMap.min()
-	return rst
+	return s.Left().Key
 }
 
 func (s *treeSet) max() interface{} {
-	rst, _ := s.treeMap.max()
-	return rst
+	return s.Right().Key
 }
 
 func (s *treeSet) floor(x interface{}) interface{} {
-	rst, _ := s.treeMap.floor(x)
-	return rst
+	if node := s.Floor(x); node != nil {
+		return node.Key
+	}
+	return nil
 }
 
 func (s *treeSet) ceiling(x interface{}) interface{} {
-	rst, _ := s.treeMap.ceiling(x)
-	return rst
+	if node := s.Ceiling(x); node != nil {
+		return node.Key
+	}
+	return nil
 }
 
 type multiSet struct {
@@ -722,7 +900,7 @@ func _comparator(comparator utils.Comparator) utils.Comparator {
 	}
 }
 
-func mts(comparator utils.Comparator) *multiSet {
+var mts = func(comparator utils.Comparator) *multiSet {
 	return &multiSet{
 		treeSet: ts(_comparator(comparator)),
 		cnt:     make(map[interface{}]int),
@@ -754,8 +932,13 @@ func (s *multiSet) contains(items ...interface{}) bool {
 	return true
 }
 
-func (s *multiSet) values() []interface{} {
-	values := s.treeSet.values()
+func (s *multiSet) Clear() {
+	s.treeSet.Clear()
+	s.cnt = make(map[interface{}]int)
+}
+
+func (s *multiSet) Values() []interface{} {
+	values := s.treeSet.Values()
 	rst := make([]interface{}, 0, len(values))
 	for _, val := range values {
 		rst = append(rst, val.(_pair).val)
@@ -789,17 +972,17 @@ type deque struct {
 	*list.List
 }
 
-func dq() *deque {
+var dq = func() *deque {
 	return &deque{list.New()}
 }
 
 func (q *deque) popFront() interface{} {
-	_assert(q.Len() > 0)
+	_assert("deque_popFront", q.Len() > 0)
 	return q.Remove(q.Front())
 }
 
 func (q *deque) popBack() interface{} {
-	_assert(q.Len() > 0)
+	_assert("deque_popBack", q.Len() > 0)
 	return q.Remove(q.Back())
 }
 
@@ -809,7 +992,7 @@ type trieNode struct {
 	curCnt, subCnt int
 }
 
-func newTrieNode(size int, parent *trieNode) *trieNode {
+var trn = func(size int, parent *trieNode) *trieNode {
 	return &trieNode{
 		children: make([]*trieNode, size),
 		parent:   parent,
@@ -819,7 +1002,7 @@ func newTrieNode(size int, parent *trieNode) *trieNode {
 type trie struct {
 	root   *trieNode
 	size   int
-	idxMap map[rune]int
+	idxMap map[byte]int
 }
 
 const (
@@ -828,31 +1011,31 @@ const (
 	numbers   = "0123456789"
 )
 
-func tr(charSet string) *trie {
+var tr = func(charSet string) *trie {
 	size := len(charSet)
-	_assert(size > 0)
-	idxMap := make(map[rune]int, size)
-	for i, c := range charSet {
+	_assert("tr", size > 0)
+	idxMap := make(map[byte]int, size)
+	for i, c := range text(charSet) {
 		if _, ok := idxMap[c]; ok {
-			panic(nil)
+			panic("tr")
 		}
 		idxMap[c] = i
 	}
 	return &trie{
-		root:   newTrieNode(size, nil),
+		root:   trn(size, nil),
 		size:   size,
 		idxMap: idxMap,
 	}
 }
 
 func (t *trie) insert(s string, cnt int) {
-	_assert(cnt > 0)
+	_assert("trie_insert", cnt > 0)
 	p := t.root
-	for _, c := range s {
+	for _, c := range text(s) {
 		p.subCnt += cnt
 		idx := t.idxMap[c]
 		if p.children[idx] == nil {
-			p.children[idx] = newTrieNode(t.size, p)
+			p.children[idx] = trn(t.size, p)
 		}
 		p = p.children[idx]
 	}
@@ -861,7 +1044,7 @@ func (t *trie) insert(s string, cnt int) {
 
 func (t *trie) search(s string) *trieNode {
 	p := t.root
-	for _, c := range s {
+	for _, c := range text(s) {
 		if p = p.children[t.idxMap[c]]; p == nil {
 			return nil
 		}
@@ -882,9 +1065,9 @@ type strHash struct {
 	a, b   []int
 }
 
-func sh(s string, p, mod int) *strHash {
+var sh = func(s string, p, mod int) *strHash {
 	n := len(s)
-	_assert(n > 0)
+	_assert("sh", n > 0)
 	a, b := vct(n+1, 0), vct(n+1, 0)
 	b[0] = 1
 	for i := 1; i <= n; i++ {
@@ -900,7 +1083,8 @@ func sh(s string, p, mod int) *strHash {
 }
 
 func (h *strHash) equal(l1, r1, l2, r2 int) bool {
-	_assert(btw(l1, 0, h.n-1), btw(r1, l1, h.n-1), btw(l2, 0, h.n-1), btw(r2, l2, h.n-1), r1-l1 == r2-l2)
+	_assert("strHash_equal",
+		l1 >= 0, l1 < h.n, r1 >= l1, r1 < h.n, l2 >= 0, l2 < h.n, r2 >= l2, r2 < h.n, r1-l1 == r2-l2)
 	return l1 == l2 || h.calc(l1, r1) == h.calc(l2, r2)
 }
 
@@ -913,7 +1097,7 @@ type unionFind struct {
 	a    []int
 }
 
-func uf(size int) *unionFind {
+var uf = func(size int) *unionFind {
 	a := vct(size, 0)
 	for i := range a {
 		a[i] = i
@@ -925,7 +1109,7 @@ func uf(size int) *unionFind {
 }
 
 func (f *unionFind) find(x int) int {
-	_assert(btw(x, 0, f.size-1))
+	_assert("unionFind_find", x >= 0, x < f.size)
 	if f.a[x] != x {
 		f.a[x] = f.find(f.a[x])
 	}
@@ -933,7 +1117,7 @@ func (f *unionFind) find(x int) int {
 }
 
 func (f *unionFind) union(x, y int) {
-	_assert(btw(x, 0, f.size-1), btw(y, 0, f.size-1))
+	_assert("unionFind_union", x >= 0, x < f.size, y >= 0, y < f.size)
 	f.a[f.find(x)] = f.find(y)
 }
 
@@ -942,8 +1126,8 @@ type segmentTree struct {
 	a, f, v []int
 }
 
-func st(l, r int, a []int) *segmentTree {
-	_assert(l < r)
+var st = func(l, r int, a []int) *segmentTree {
+	_assert("st", l < r)
 	size := (r - l + 1) << 2
 	t := &segmentTree{
 		l: l,
@@ -968,7 +1152,7 @@ func (t *segmentTree) _build(idx, l, r int) {
 }
 
 func (t *segmentTree) insert(x, y, k int) {
-	_assert(btw(x, t.l, t.r), btw(y, x, t.r))
+	_assert("segmentTree_insert", x >= t.l, x <= t.r, y >= x, y <= t.r)
 	t._insert(1, t.l, t.r, x, y, k)
 }
 
@@ -990,7 +1174,7 @@ func (t *segmentTree) _insert(idx, l, r, x, y, k int) {
 }
 
 func (t *segmentTree) calc(x, y int) int {
-	_assert(btw(x, t.l, t.r), btw(y, x, t.r))
+	_assert("segmentTree_calc", x >= t.l, x <= t.r, y >= x, y <= t.r)
 	return t._calc(1, t.l, t.r, x, y, 0)
 }
 
