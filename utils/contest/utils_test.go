@@ -155,15 +155,17 @@ func Test_lcm(t *testing.T) {
 }
 
 func Test_c(t *testing.T) {
-	type args struct {
-		n, k, mod int
+	n, mod := 6, 0
+	c = mtx(n+1, n+1, 0)
+	for i := 0; i <= n; i++ {
+		c[i][0] = 1
+		for j := 1; j <= i; j++ {
+			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
+				c[i][j] %= mod
+			}
+		}
 	}
-	cache = mtx(1001, 1001, -1)
-	for _, a := range []*args{
-		{1, 0, 0}, {1, 1, 0}, {5, 3, 0}, {1000, 500, mod},
-	} {
-		t.Log(c(a.n, a.k, a.mod))
-	}
+	t.Log(c)
 }
 
 func Test_isPrime(t *testing.T) {
@@ -185,6 +187,29 @@ func Test_factor(t *testing.T) {
 		{0}, {1}, {2}, {12}, {1 << 30},
 	} {
 		t.Log(factor(a.n))
+	}
+}
+
+func Test_text_split(t *testing.T) {
+	type args struct {
+		s, charSet string
+	}
+	for _, a := range []*args{
+		{"0, 1 23", " ,"},
+	} {
+		t.Log(text(a.s).split(a.charSet))
+	}
+}
+
+func Test_srd(t *testing.T) {
+	type args struct {
+		m, n, i, j int
+		drt        []vector
+	}
+	for _, a := range []*args{
+		{2, 2, 0, 0, drt}, {2, 2, 0, 0, drt2},
+	} {
+		t.Log(srd(a.m, a.n, a.i, a.j, a.drt))
 	}
 }
 

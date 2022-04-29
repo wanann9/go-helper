@@ -4,9 +4,11 @@ import (
 	"container/list"
 	"fmt"
 	"math"
+	"reflect"
 	"sort"
 	"strconv"
 
+	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/emirpasic/gods/trees/binaryheap"
 	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/emirpasic/gods/utils"
@@ -89,7 +91,7 @@ var abs = func(a int) int {
 }
 
 var min = func(nums ...int) int {
-	_assert("min", len(nums) > 1)
+	_assert("min", len(nums) > 0)
 	rst := math.MaxInt
 	for _, n := range nums {
 		rst = _ternary(n < rst, n, rst)
@@ -98,7 +100,7 @@ var min = func(nums ...int) int {
 }
 
 var max = func(nums ...int) int {
-	_assert("max", len(nums) > 1)
+	_assert("max", len(nums) > 0)
 	rst := math.MinInt
 	for _, n := range nums {
 		rst = _ternary(n > rst, n, rst)
@@ -133,28 +135,20 @@ var lcm = func(a, b int) int {
 	return a / gcd(a, b) * b
 }
 
-var cache [][]int
+var c [][]int
 
 //func init() {
-//	cache = mtx(1001, 1001, -1)
+//	n, mod := 1000, 0
+//	c = mtx(n+1, n+1, 0)
+//	for i := 0; i <= n; i++ {
+//		c[i][0] = 1
+//		for j := 1; j <= i; j++ {
+//			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
+//				c[i][j] %= mod
+//			}
+//		}
+//	}
 //}
-
-func c(n, k, mod int) (rst int) {
-	_assert("c", n > 0, k >= 0, k <= n)
-	if cache[n][k] >= 0 {
-		return cache[n][k]
-	}
-	defer func() {
-		cache[n][k], cache[n][n-k] = rst, rst
-	}()
-	if k = _ternary(k > n>>1, n-k, k); k == 0 {
-		return 1
-	}
-	if rst = c(n-1, k-1, mod) + c(n-1, k, mod); mod > 1 {
-		rst %= mod
-	}
-	return
-}
 
 var isPrime = func(n int) bool {
 	_assert("isPrime", n >= 0)
@@ -630,24 +624,6 @@ var ub = func(l, r int, check func(int) bool) int {
 
 type vector []int
 
-func (v vector) min() int {
-	_assert("vector_min", len(v) > 0)
-	rst := math.MaxInt
-	for _, n := range v {
-		rst = min(rst, n)
-	}
-	return rst
-}
-
-func (v vector) max() int {
-	_assert("vector_max", len(v) > 0)
-	rst := math.MinInt
-	for _, n := range v {
-		rst = max(rst, n)
-	}
-	return rst
-}
-
 func (v vector) sum() (rst int) {
 	for _, n := range v {
 		rst += n
@@ -663,6 +639,32 @@ func (v vector) preSum() []int {
 	return rst
 }
 
+func (v vector) postSum() []int {
+	rst := vct(len(v)+1, 0)
+	for i := len(v) - 1; i >= 0; i-- {
+		rst[i] = rst[i+1] + v[i]
+	}
+	return rst
+}
+
+func (v vector) left(check func(int, int) bool) []int {
+	rst := vct(len(v), 0)
+	for i := 0; i < len(v); i++ {
+		for rst[i] = i - 1; rst[i] >= 0 && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
+		}
+	}
+	return rst
+}
+
+func (v vector) right(check func(int, int) bool) []int {
+	rst := vct(len(v), 0)
+	for i := len(v) - 1; i >= 0; i-- {
+		for rst[i] = i + 1; rst[i] < len(v) && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
+		}
+	}
+	return rst
+}
+
 func (v vector) counts() map[int]int {
 	rst := make(map[int]int, len(v))
 	for _, n := range v {
@@ -672,6 +674,25 @@ func (v vector) counts() map[int]int {
 }
 
 type text []byte
+
+func (t text) split(charSet string) (rst []string) {
+	_assert("text_split", len(charSet) > 0)
+	m := make(map[byte]struct{}, len(charSet))
+	for _, c := range text(charSet) {
+		m[c] = struct{}{}
+	}
+	i := -1
+	for j, c := range append(t, charSet[0]) {
+		if _, ok := m[c]; !ok {
+			continue
+		}
+		if j > i+1 {
+			rst = append(rst, string(t[i+1:j]))
+		}
+		i = j
+	}
+	return
+}
 
 func (t text) counts() map[byte]int {
 	rst := make(map[byte]int, 256)
@@ -690,8 +711,8 @@ var srd = func(m, n, i, j int, drt []vector) []vector {
 	_assert("srd", in(i, j, 0, 0, m-1, n-1))
 	rst := make([]vector, 0, len(drt))
 	for _, d := range drt {
-		if p := []int{i + d[0], j + d[1]}; in(p[0], p[1], 0, 0, m-1, n-1) {
-			rst = append(rst, p)
+		if x, y := i+d[0], j+d[1]; in(x, y, 0, 0, m-1, n-1) {
+			rst = append(rst, vector{x, y})
 		}
 	}
 	return rst
@@ -835,15 +856,15 @@ var ts = func(comparator utils.Comparator) *treeSet {
 	return &treeSet{tm(comparator)}
 }
 
-func (s *treeSet) add(items ...interface{}) {
+func (s *treeSet) Put(items ...interface{}) {
 	for _, item := range items {
-		s.Put(item, struct{}{})
+		s.Tree.Put(item, struct{}{})
 	}
 }
 
-func (s *treeSet) remove(items ...interface{}) {
+func (s *treeSet) Remove(items ...interface{}) {
 	for _, item := range items {
-		s.Remove(item)
+		s.Tree.Remove(item)
 	}
 }
 
@@ -858,6 +879,40 @@ func (s *treeSet) contains(items ...interface{}) bool {
 
 func (s *treeSet) Values() []interface{} {
 	return s.Keys()
+}
+
+func (s *treeSet) intersection(another *treeSet) *treeSet {
+	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
+	rst := ts(s.Comparator)
+	for it := s.Iterator(); it.Next(); {
+		if item := it.Key(); another.contains(item) {
+			rst.Put(item)
+		}
+	}
+	return rst
+}
+
+func (s *treeSet) union(another *treeSet) *treeSet {
+	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
+	rst := ts(s.Comparator)
+	for it := s.Iterator(); it.Next(); {
+		rst.Put(it.Key())
+	}
+	for it := another.Iterator(); it.Next(); {
+		rst.Put(it.Key())
+	}
+	return rst
+}
+
+func (s *treeSet) difference(another *treeSet) *treeSet {
+	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
+	rst := ts(s.Comparator)
+	for it := s.Iterator(); it.Next(); {
+		if item := it.Key(); !another.contains(item) {
+			rst.Put(item)
+		}
+	}
+	return rst
 }
 
 func (s *treeSet) min() interface{} {
@@ -887,14 +942,14 @@ type multiSet struct {
 	cnt map[interface{}]int
 }
 
-type _pair struct {
+type _item struct {
 	val interface{}
 	idx int
 }
 
 func _comparator(comparator utils.Comparator) utils.Comparator {
 	return func(a, b interface{}) int {
-		aa, bb := a.(_pair), b.(_pair)
+		aa, bb := a.(_item), b.(_item)
 		key := comparator(aa.val, bb.val)
 		return _ternary(key != 0, key, aa.idx-bb.idx)
 	}
@@ -907,18 +962,18 @@ var mts = func(comparator utils.Comparator) *multiSet {
 	}
 }
 
-func (s *multiSet) add(items ...interface{}) {
+func (s *multiSet) Put(items ...interface{}) {
 	for _, item := range items {
-		s.treeSet.add(_pair{item, s.cnt[item]})
+		s.treeSet.Put(_item{item, s.cnt[item]})
 		s.cnt[item]++
 	}
 }
 
-func (s *multiSet) remove(items ...interface{}) {
+func (s *multiSet) Remove(items ...interface{}) {
 	for _, item := range items {
 		if s.cnt[item] > 0 {
 			s.cnt[item]--
-			s.treeSet.remove(_pair{item, s.cnt[item]})
+			s.treeSet.Remove(_item{item, s.cnt[item]})
 		}
 	}
 }
@@ -938,34 +993,85 @@ func (s *multiSet) Clear() {
 }
 
 func (s *multiSet) Values() []interface{} {
-	values := s.treeSet.Values()
-	rst := make([]interface{}, 0, len(values))
-	for _, val := range values {
-		rst = append(rst, val.(_pair).val)
+	items := s.treeSet.Values()
+	rst := make([]interface{}, 0, len(items))
+	for _, item := range items {
+		rst = append(rst, item.(_item).val)
 	}
 	return rst
 }
 
 func (s *multiSet) min() interface{} {
-	return s.treeSet.min().(_pair).val
+	return s.treeSet.min().(_item).val
 }
 
 func (s *multiSet) max() interface{} {
-	return s.treeSet.max().(_pair).val
+	return s.treeSet.max().(_item).val
 }
 
 func (s *multiSet) floor(x interface{}) interface{} {
-	if p := s.treeSet.floor(_pair{x, 0}); p != nil {
-		return p.(_pair).val
+	if item := s.treeSet.floor(_item{x, 0}); item != nil {
+		return item.(_item).val
 	}
 	return nil
 }
 
 func (s *multiSet) ceiling(x interface{}) interface{} {
-	if p := s.treeSet.ceiling(_pair{x, 0}); p != nil {
-		return p.(_pair).val
+	if item := s.treeSet.ceiling(_item{x, 0}); item != nil {
+		return item.(_item).val
 	}
 	return nil
+}
+
+var hs = func(a interface{}) *hashset.Set {
+	s := hashset.New()
+	switch aa := a.(type) {
+	case []int:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []int64:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []uint:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []uint64:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []byte:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []rune:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []float64:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []bool:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []string:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []vector:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case []interface{}:
+		s.Add(aa...)
+	default:
+		panic("hs")
+	}
+	return s
 }
 
 type deque struct {
@@ -976,13 +1082,17 @@ var dq = func() *deque {
 	return &deque{list.New()}
 }
 
+func (q *deque) empty() bool {
+	return q.Len() == 0
+}
+
 func (q *deque) popFront() interface{} {
-	_assert("deque_popFront", q.Len() > 0)
+	_assert("deque_popFront", !q.empty())
 	return q.Remove(q.Front())
 }
 
 func (q *deque) popBack() interface{} {
-	_assert("deque_popBack", q.Len() > 0)
+	_assert("deque_popBack", !q.empty())
 	return q.Remove(q.Back())
 }
 
