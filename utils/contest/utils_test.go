@@ -2,6 +2,7 @@ package contest
 
 import (
 	"math"
+	"math/rand"
 	"testing"
 )
 
@@ -204,13 +205,57 @@ func Test_text_split(t *testing.T) {
 func Test_srd(t *testing.T) {
 	type args struct {
 		m, n, i, j int
-		drt        []vector
+		drt        []pair
 	}
 	for _, a := range []*args{
 		{2, 2, 0, 0, drt}, {2, 2, 0, 0, drt2},
 	} {
 		t.Log(srd(a.m, a.n, a.i, a.j, a.drt))
 	}
+}
+
+func Test_treeMap(t *testing.T) {
+	m := tm(cmp)
+	for _, n := range rand.Perm(10) {
+		m.Put(n, 10-n)
+	}
+	t.Log(m.Left(), m.Right())
+	it := m.IteratorAt(m.Left())
+	for it.Prev(); it.Next(); {
+		t.Log(it.Key(), it.Value())
+	}
+	for it.Prev() {
+		t.Log(it.Key(), it.Value())
+	}
+}
+
+func Test_treeSet(t *testing.T) {
+	s1, s2, s3 := ts(cmp), ts(cmp), ts(cmp2)
+	s1.Put(1, 3, 5)
+	s2.Put(2, 3, 4, 5)
+	t.Log(s1.intersection(s2).Values())
+	t.Log(s1.union(s2).Values())
+	t.Log(s1.difference(s2).Values())
+	s3.Put(vector{1, 2}, vector{2, 3})
+	t.Log(s3.Values())
+}
+
+func Test_multiSet(t *testing.T) {
+	s := mts(cmp)
+	for i := 0; i < 20; i++ {
+		s.Put(vector{i % 10, 10 - i%10})
+	}
+	t.Log(s.Values(), s.cnt.Values())
+	s.Remove(vector{0, 10}, vector{1, 9}, vector{1, 8})
+	s.removeAll(vector{2, 8}, vector{3, 7}, vector{3, 6})
+	t.Log(s.Values(), s.cnt.Values())
+}
+
+func Test_hs(t *testing.T) {
+	s1, s2 := hs([]pair{{0, 0}, {0, 1}}), hs([]pair{{0, 1}, {1, 0}})
+	t.Log(s1.Intersection(s2))
+	t.Log(s1.Union(s2))
+	t.Log(s1.Difference(s2))
 }
 
 func Test_1(t *testing.T) {
