@@ -4,9 +4,12 @@ import (
 	"container/list"
 	"fmt"
 	"math"
+	"math/big"
+	"math/bits"
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/emirpasic/gods/trees/binaryheap"
@@ -34,7 +37,7 @@ var prt, prf = fmt.Println, fmt.Printf
 var s2i = func(s string, base int) int {
 	rst, err := strconv.ParseInt(s, base, 64)
 	if err != nil {
-		prt(err)
+		_, _ = prt(err)
 	}
 	return int(rst)
 }
@@ -84,7 +87,39 @@ var isUpper = func(a interface{}) bool {
 	}
 }
 
-const mod int = 1e9 + 7
+var toLower = func(a interface{}) byte {
+	switch aa := a.(type) {
+	case byte:
+		if isUpper(aa) {
+			aa ^= 32
+		}
+		return aa
+	case rune:
+		if isUpper(aa) {
+			aa ^= 32
+		}
+		return byte(aa)
+	default:
+		panic("toLower")
+	}
+}
+
+var toUpper = func(a interface{}) byte {
+	switch aa := a.(type) {
+	case byte:
+		if isLower(aa) {
+			aa ^= 32
+		}
+		return aa
+	case rune:
+		if isLower(aa) {
+			aa ^= 32
+		}
+		return byte(aa)
+	default:
+		panic("toUpper")
+	}
+}
 
 var abs = func(a int) int {
 	return _ternary(a >= 0, a, -a)
@@ -137,18 +172,17 @@ var lcm = func(a, b int) int {
 
 var c [][]int
 
-//func init() {
-//	n, mod := 1000, 0
-//	c = mtx(n+1, n+1, 0)
-//	for i := 0; i <= n; i++ {
-//		c[i][0] = 1
-//		for j := 1; j <= i; j++ {
-//			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
-//				c[i][j] %= mod
-//			}
-//		}
-//	}
-//}
+func _initC(n, mod int) {
+	c = mtx(n+1, n+1, 0)
+	for i := 0; i <= n; i++ {
+		c[i][0] = 1
+		for j := 1; j <= i; j++ {
+			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
+				c[i][j] %= mod
+			}
+		}
+	}
+}
 
 var isPrime = func(n int) bool {
 	_assert("isPrime", n >= 0)
@@ -607,6 +641,14 @@ var cmp2 = func(a, b interface{}) int {
 	return -cmp(a, b)
 }
 
+// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// []interface{}
+var eq = func(a, b interface{}) bool {
+	return cmp(a, b) == 0
+}
+
 // []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
 // []interface{}
 var srt = func(a interface{}, comparator utils.Comparator) {
@@ -646,6 +688,255 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 	}
 }
 
+var unq = func(a interface{}) (rst interface{}) {
+	switch aa := a.(type) {
+	case []int:
+		rst = make([]int, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]int), item)
+			}
+		}
+	case []int64:
+		rst = make([]int64, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]int64), item)
+			}
+		}
+	case []uint:
+		rst = make([]uint, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]uint), item)
+			}
+		}
+	case []uint64:
+		rst = make([]uint64, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]uint64), item)
+			}
+		}
+	case []byte:
+		rst = make([]byte, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]byte), item)
+			}
+		}
+	case []rune:
+		rst = make([]rune, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]rune), item)
+			}
+		}
+	case []float64:
+		rst = make([]float64, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]float64), item)
+			}
+		}
+	case []bool:
+		rst = make([]bool, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]bool), item)
+			}
+		}
+	case []string:
+		rst = make([]string, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]string), item)
+			}
+		}
+	case []pair:
+		rst = make([]pair, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]pair), item)
+			}
+		}
+	case []triplet:
+		rst = make([]triplet, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]triplet), item)
+			}
+		}
+	case []vector:
+		rst = make([]vector, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]vector), item)
+			}
+		}
+	case []interface{}:
+		rst = make([]interface{}, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]interface{}), item)
+			}
+		}
+	default:
+		panic("unq")
+	}
+	return rst
+}
+
+const (
+	et byte = 1 << iota
+	lt
+	gt
+	lgt = lt | gt
+)
+
+var tp = func(a interface{}) (rst byte) {
+	switch aa := a.(type) {
+	case []int:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []int64:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []uint:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []uint64:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []byte:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []rune:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []float64:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []bool:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []string:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []pair:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []triplet:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []vector:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []interface{}:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	default:
+		panic("tp")
+	}
+	return
+}
+
+func _tp(a, b interface{}) byte {
+	if rst := cmp(a, b); rst == 0 {
+		return et
+	} else if rst < 0 {
+		return lt
+	}
+	return gt
+}
+
+var bs = func(a, b interface{}, t byte) int {
+	_assert("bs", t&lgt < lgt)
+	switch aa := a.(type) {
+	case []int:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []int64:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []uint:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []uint64:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []byte:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []rune:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []float64:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []bool:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []string:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []pair:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []triplet:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []vector:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case []interface{}:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	default:
+		panic("bs")
+	}
+	return -1
+}
+
 var fd = func(l, r, i int, check func(int) bool) int {
 	_assert("fd", l <= r, i != 0)
 	inc := 1
@@ -682,91 +973,6 @@ var ub = func(l, r int, check func(int) bool) int {
 		}
 	}
 	return l
-}
-
-type (
-	pair    [2]int
-	triplet [3]int
-)
-
-type vector []int
-
-func (v vector) sum() (rst int) {
-	for _, n := range v {
-		rst += n
-	}
-	return
-}
-
-func (v vector) preSum() []int {
-	rst := vct(len(v)+1, 0)
-	for i, n := range v {
-		rst[i+1] = rst[i] + n
-	}
-	return rst
-}
-
-func (v vector) postSum() []int {
-	rst := vct(len(v)+1, 0)
-	for i := len(v) - 1; i >= 0; i-- {
-		rst[i] = rst[i+1] + v[i]
-	}
-	return rst
-}
-
-func (v vector) left(check func(int, int) bool) []int {
-	rst := vct(len(v), 0)
-	for i := 0; i < len(v); i++ {
-		for rst[i] = i - 1; rst[i] >= 0 && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
-		}
-	}
-	return rst
-}
-
-func (v vector) right(check func(int, int) bool) []int {
-	rst := vct(len(v), 0)
-	for i := len(v) - 1; i >= 0; i-- {
-		for rst[i] = i + 1; rst[i] < len(v) && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
-		}
-	}
-	return rst
-}
-
-func (v vector) counts() map[int]int {
-	rst := make(map[int]int, len(v))
-	for _, n := range v {
-		rst[n]++
-	}
-	return rst
-}
-
-type text []byte
-
-func (t text) split(charSet string) (rst []string) {
-	_assert("text_split", len(charSet) > 0)
-	m := make(map[byte]struct{}, len(charSet))
-	for _, c := range text(charSet) {
-		m[c] = struct{}{}
-	}
-	i := -1
-	for j, c := range append(t, charSet[0]) {
-		if _, ok := m[c]; !ok {
-			continue
-		}
-		if j > i+1 {
-			rst = append(rst, string(t[i+1:j]))
-		}
-		i = j
-	}
-	return
-}
-
-func (t text) counts() map[byte]int {
-	rst := make(map[byte]int, 256)
-	for _, c := range t {
-		rst[c]++
-	}
-	return rst
 }
 
 var (
@@ -863,6 +1069,91 @@ var tpSort = func(n int, g [][]pair, id []int) []int {
 				rst = append(rst, e[1])
 			}
 		}
+	}
+	return rst
+}
+
+type (
+	pair    [2]int
+	triplet [3]int
+)
+
+type vector []int
+
+func (v vector) sum() (rst int) {
+	for _, n := range v {
+		rst += n
+	}
+	return
+}
+
+func (v vector) preSum() []int {
+	rst := vct(len(v)+1, 0)
+	for i, n := range v {
+		rst[i+1] = rst[i] + n
+	}
+	return rst
+}
+
+func (v vector) postSum() []int {
+	rst := vct(len(v)+1, 0)
+	for i := len(v) - 1; i >= 0; i-- {
+		rst[i] = rst[i+1] + v[i]
+	}
+	return rst
+}
+
+func (v vector) left(check func(int, int) bool) []int {
+	rst := vct(len(v), 0)
+	for i := 0; i < len(v); i++ {
+		for rst[i] = i - 1; rst[i] >= 0 && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
+		}
+	}
+	return rst
+}
+
+func (v vector) right(check func(int, int) bool) []int {
+	rst := vct(len(v), 0)
+	for i := len(v) - 1; i >= 0; i-- {
+		for rst[i] = i + 1; rst[i] < len(v) && !check(v[rst[i]], v[i]); rst[i] = rst[rst[i]] {
+		}
+	}
+	return rst
+}
+
+func (v vector) counts() map[int]int {
+	rst := make(map[int]int, len(v))
+	for _, n := range v {
+		rst[n]++
+	}
+	return rst
+}
+
+type text []byte
+
+func (t text) split(charSet string) (rst []string) {
+	_assert("text_split", len(charSet) > 0)
+	m := make(map[byte]struct{}, len(charSet))
+	for _, c := range text(charSet) {
+		m[c] = struct{}{}
+	}
+	i := -1
+	for j, c := range append(t, charSet[0]) {
+		if _, ok := m[c]; !ok {
+			continue
+		}
+		if j > i+1 {
+			rst = append(rst, string(t[i+1:j]))
+		}
+		i = j
+	}
+	return
+}
+
+func (t text) counts() map[byte]int {
+	rst := make(map[byte]int, 256)
+	for _, c := range t {
+		rst[c]++
 	}
 	return rst
 }
@@ -1027,25 +1318,40 @@ var mts = func(comparator utils.Comparator) *multiSet {
 
 func (s *multiSet) Put(items ...interface{}) {
 	for _, item := range items {
-		if node := s.cnt.GetNode(item); node != nil {
-			cnt := node.Value.(int)
-			s.treeSet.Put(_item{item, cnt})
-			node.Value = cnt + 1
-		} else {
-			s.treeSet.Put(_item{item, 0})
-			s.cnt.Put(item, 1)
+		//if node := s.cnt.GetNode(item); node != nil {
+		//	cnt := node.Value.(int)
+		//	s.treeSet.Put(_item{item, cnt})
+		//	node.Value = cnt + 1
+		//} else {
+		//	s.treeSet.Put(_item{item, 0})
+		//	s.cnt.Put(item, 1)
+		//}
+		cnt := 0
+		if val, found := s.cnt.Get(item); found {
+			cnt = val.(int)
 		}
+		s.treeSet.Put(_item{item, cnt})
+		s.cnt.Put(item, cnt+1)
 	}
 }
 
 func (s *multiSet) Remove(items ...interface{}) {
 	for _, item := range items {
-		if node := s.cnt.GetNode(item); node != nil {
-			cnt := node.Value.(int)
+		//if node := s.cnt.GetNode(item); node != nil {
+		//	cnt := node.Value.(int)
+		//	if cnt--; cnt == 0 {
+		//		s.cnt.Remove(item)
+		//	} else {
+		//		node.Value = cnt
+		//	}
+		//	s.treeSet.Remove(_item{item, cnt})
+		//}
+		if val, found := s.cnt.Get(item); found {
+			cnt := val.(int)
 			if cnt--; cnt == 0 {
 				s.cnt.Remove(item)
 			} else {
-				node.Value = cnt
+				s.cnt.Put(item, cnt)
 			}
 			s.treeSet.Remove(_item{item, cnt})
 		}
@@ -1111,6 +1417,9 @@ func (s *multiSet) ceiling(x interface{}) interface{} {
 
 var hs = func(a interface{}) *hashset.Set {
 	s := hashset.New()
+	if a == nil {
+		return s
+	}
 	switch aa := a.(type) {
 	case []int:
 		for _, item := range aa {
@@ -1176,12 +1485,70 @@ func (q *deque) empty() bool {
 	return q.Len() == 0
 }
 
+func (q *deque) Front() *list.Element {
+	_assert("deque_Front", !q.empty())
+	return q.List.Front()
+}
+
+func (q *deque) Back() *list.Element {
+	_assert("deque_Back", !q.empty())
+	return q.List.Back()
+}
+
 func (q *deque) popFront() interface{} {
-	_assert("deque_popFront", !q.empty())
 	return q.Remove(q.Front())
 }
 
 func (q *deque) popBack() interface{} {
-	_assert("deque_popBack", !q.empty())
 	return q.Remove(q.Back())
 }
+
+var (
+	_          = big.NewInt
+	_          = bits.Len
+	_          = bits.Reverse
+	_          = bits.OnesCount
+	_, _       = bits.LeadingZeros, bits.TrailingZeros
+	_          = strings.Map
+	_          = strings.Join
+	_          = strings.Count
+	_          = strings.Repeat
+	_          = strings.Replace
+	_          = strings.EqualFold
+	_, _       = strings.ToLower, strings.ToUpper
+	_, _       = strings.SplitN, strings.SplitAfterN
+	_, _       = strings.HasPrefix, strings.HasSuffix
+	_, _       = strings.Contains, strings.ContainsAny
+	_, _, _    = strings.Index, strings.IndexAny, strings.IndexFunc
+	_, _, _    = strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc
+	_, _, _, _ = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
+	_, _, _, _ = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
+
+	_, _                         = prt, prf
+	_, _, _                      = s2i, i2s, b2i
+	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
+	_, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, isPrime, factor
+	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
+	_, _, _, _, _, _, _, _, _, _ = sz, pop, back, rvs, cp, cmp, cmp2, eq, srt, unq
+	_, _, _, _, _, _, _, _, _    = et, lt, gt, lgt, tp, bs, fd, lb, ub
+	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
+	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
+	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
+	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
+)
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+type TreeNode struct {
+	Val         int
+	Left, Right *TreeNode
+}
+
+const mod int = 1e9 + 7
+
+//func init() {
+//	_initC(1000, 0)
+//}

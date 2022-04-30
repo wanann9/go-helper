@@ -88,6 +88,18 @@ func Test_isUpper(t *testing.T) {
 	}
 }
 
+func Test_toLower(t *testing.T) {
+	for _, c := range "azAZ." {
+		t.Logf("%c %c", toLower(c), toLower(byte(c)))
+	}
+}
+
+func Test_toUpper(t *testing.T) {
+	for _, c := range "azAZ." {
+		t.Logf("%c %c", toUpper(c), toUpper(byte(c)))
+	}
+}
+
 func Test_abs(t *testing.T) {
 	type args struct {
 		a int
@@ -156,16 +168,7 @@ func Test_lcm(t *testing.T) {
 }
 
 func Test_c(t *testing.T) {
-	n, mod := 6, 0
-	c = mtx(n+1, n+1, 0)
-	for i := 0; i <= n; i++ {
-		c[i][0] = 1
-		for j := 1; j <= i; j++ {
-			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
-				c[i][j] %= mod
-			}
-		}
-	}
+	_initC(6, 0)
 	t.Log(c)
 }
 
@@ -188,6 +191,66 @@ func Test_factor(t *testing.T) {
 		{0}, {1}, {2}, {12}, {1 << 30},
 	} {
 		t.Log(factor(a.n))
+	}
+}
+
+func Test_cp(t *testing.T) {
+	type args struct {
+		a interface{}
+	}
+	for _, a := range []*args{
+		{vector{0, 1}}, {[]pair{{0, 1}, {2, 3}}},
+	} {
+		t.Log(cp(a.a))
+	}
+}
+
+func Test_unq(t *testing.T) {
+	type args struct {
+		a interface{}
+	}
+	for _, a := range []*args{
+		{[]vector{{0}, {0, 1}, {0, 1}, {0, 1}, {1}, {1}, {1, 2}}},
+	} {
+		t.Log(unq(a.a))
+	}
+}
+
+func Test_tp(t *testing.T) {
+	type args struct {
+		a interface{}
+	}
+	for _, a := range []*args{
+		{[]int{0}},
+		{[]int{0, 0}},
+		{[]int{0, 1}},
+		{[]int{1, 0}},
+		{[]int{0, 1, 1}},
+		{[]int{1, 0, 0}},
+		{[]int{0, 1, 0}},
+	} {
+		t.Logf("%b", tp(a.a))
+	}
+}
+
+func Test_bs(t *testing.T) {
+	type args struct {
+		a, b interface{}
+		t    byte
+	}
+	for _, a := range []*args{
+		{[]int{}, 0, 0},
+		{[]int{0}, 0, 0},
+		{[]int{0}, 1, 0},
+		{[]int{0, 0}, 1, 1},
+		{[]int{0, 1, 1, 3}, 1, 3},
+		{[]int{0, 1, 1, 3}, 2, 3},
+		{[]int{0, 1, 1, 3}, 4, 3},
+		{[]int{3, 1, 1, 0}, 1, 5},
+		{[]int{3, 1, 1, 0}, 2, 5},
+		{[]int{3, 1, 1, 0}, 4, 5},
+	} {
+		t.Log(bs(a.a, a.b, a.t))
 	}
 }
 
