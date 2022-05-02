@@ -6,6 +6,16 @@ import (
 	"testing"
 )
 
+func Test_plt(t *testing.T) {
+	plt([][]int{})
+	plt([][]int{{}})
+	plt([][]int{{0, 1}, {2, 3}})
+	plt([][]byte{{'a', 'b'}, {'c', 'd'}})
+	plt([][]bool{{false, true}, {true, false}})
+	plt([][]string{{"a", "b"}, {"c", "d"}})
+	plt([]string{"ab", "cd"})
+}
+
 func Test_s2i(t *testing.T) {
 	type args struct {
 		s    string

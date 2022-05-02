@@ -34,6 +34,62 @@ func _ternary(condition bool, a, b int) int {
 
 var prt, prf = fmt.Println, fmt.Printf
 
+var plt = func(a interface{}) {
+	var l []string
+	switch aa := a.(type) {
+	case [][]int:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]int64:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]uint:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]uint64:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]byte:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = string(v)
+		}
+	case [][]rune:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = string(v)
+		}
+	case [][]float64:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]bool:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprint(v)
+		}
+	case [][]string:
+		l = make([]string, len(aa))
+		for i, v := range aa {
+			l[i] = fmt.Sprintf("%q", v)
+		}
+	case []string:
+		l = aa
+	default:
+		panic("plt")
+	}
+	_, _ = prt("[" + strings.Join(l, "\n ") + "]")
+}
+
 var s2i = func(s string, base int) int {
 	rst, err := strconv.ParseInt(s, base, 64)
 	if err != nil {
@@ -292,73 +348,93 @@ var sz = func(a interface{}) (int, int) {
 
 var pop = func(a interface{}) (rst interface{}) {
 	switch aa := a.(type) {
+	case *vector:
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
+	case *text:
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]int:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]int64:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]uint:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]uint64:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]byte:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]rune:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]float64:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]bool:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]string:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]pair:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]triplet:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]vector:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
+	case *[]text:
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *[]interface{}:
-		rst, *aa = back(*aa), (*aa)[:len(*aa)-1]
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	default:
 		panic("pop")
 	}
 	return
 }
 
-var back = func(a interface{}) interface{} {
+var elm = func(a interface{}, i int) interface{} {
 	switch aa := a.(type) {
+	case vector:
+		return aa[(i+len(aa))%len(aa)]
+	case text:
+		return aa[(i+len(aa))%len(aa)]
 	case []int:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []int64:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []uint:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []uint64:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []byte:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []rune:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []float64:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []bool:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []string:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []pair:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []triplet:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	case []vector:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
+	case []text:
+		return aa[(i+len(aa))%len(aa)]
 	case []interface{}:
-		return aa[len(aa)-1]
+		return aa[(i+len(aa))%len(aa)]
 	default:
-		panic("back")
+		panic("elm")
 	}
 }
 
 var rvs = func(a interface{}) {
 	switch aa := a.(type) {
+	case vector:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
+		}
+	case text:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
+		}
 	case []int:
 		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
 			aa[i], aa[j] = aa[j], aa[i]
@@ -404,6 +480,10 @@ var rvs = func(a interface{}) {
 			aa[i], aa[j] = aa[j], aa[i]
 		}
 	case []vector:
+		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
+			aa[i], aa[j] = aa[j], aa[i]
+		}
+	case []text:
 		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
 			aa[i], aa[j] = aa[j], aa[i]
 		}
@@ -416,17 +496,20 @@ var rvs = func(a interface{}) {
 	}
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector
+// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
 //
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 func cp(a interface{}) (rst interface{}) {
 	switch aa := a.(type) {
 	case int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet:
 		rst = a
 	case vector:
-		rst = vector(make([]int, len(aa)))
+		rst = make(vector, len(aa))
 		copy(rst.(vector), aa)
+	case text:
+		rst = make(text, len(aa))
+		copy(rst.(text), aa)
 	case []int:
 		rst = make([]int, len(aa))
 		copy(rst.([]int), aa)
@@ -465,6 +548,11 @@ func cp(a interface{}) (rst interface{}) {
 		for i, item := range aa {
 			rst.([]vector)[i] = cp(item).(vector)
 		}
+	case []text:
+		rst = make([]text, len(aa))
+		for i, item := range aa {
+			rst.([]text)[i] = cp(item).(text)
+		}
 	case []interface{}:
 		rst = make([]interface{}, len(aa))
 		for i, item := range aa {
@@ -476,9 +564,9 @@ func cp(a interface{}) (rst interface{}) {
 	return
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector
+// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
 //
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 func cmp(a, b interface{}) int {
 	switch aa := a.(type) {
@@ -518,6 +606,14 @@ func cmp(a, b interface{}) int {
 		return 0
 	case vector:
 		bb := b.(vector)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
+	case text:
+		bb := b.(text)
 		for i := 0; i < min(len(aa), len(bb)); i++ {
 			if rst := cmp(aa[i], bb[i]); rst != 0 {
 				return rst
@@ -620,6 +716,14 @@ func cmp(a, b interface{}) int {
 			}
 		}
 		return len(aa) - len(bb)
+	case []text:
+		bb := b.([]text)
+		for i := 0; i < min(len(aa), len(bb)); i++ {
+			if rst := cmp(aa[i], bb[i]); rst != 0 {
+				return rst
+			}
+		}
+		return len(aa) - len(bb)
 	case []interface{}:
 		bb := b.([]interface{})
 		for i := 0; i < min(len(aa), len(bb)); i++ {
@@ -633,23 +737,25 @@ func cmp(a, b interface{}) int {
 	}
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector
+// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
 //
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 var cmp2 = func(a, b interface{}) int {
 	return -cmp(a, b)
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector
+// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
 //
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 var eq = func(a, b interface{}) bool {
 	return cmp(a, b) == 0
 }
 
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector,
+// vector, text
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 var srt = func(a interface{}, comparator utils.Comparator) {
 	sort.Slice(a, _less(a, comparator))
@@ -657,6 +763,10 @@ var srt = func(a interface{}, comparator utils.Comparator) {
 
 func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 	switch aa := a.(type) {
+	case vector:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case text:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []int:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []int64:
@@ -681,6 +791,8 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []vector:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
+	case []text:
+		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	case []interface{}:
 		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
 	default:
@@ -689,7 +801,22 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 }
 
 var unq = func(a interface{}) (rst interface{}) {
+	_assert("unq", tp(a)&lgt < lgt)
 	switch aa := a.(type) {
+	case vector:
+		rst = make(vector, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.(vector), item)
+			}
+		}
+	case text:
+		rst = make(text, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.(text), item)
+			}
+		}
 	case []int:
 		rst = make([]int, 0, len(aa))
 		for i, item := range aa {
@@ -774,6 +901,13 @@ var unq = func(a interface{}) (rst interface{}) {
 				rst = append(rst.([]vector), item)
 			}
 		}
+	case []text:
+		rst = make([]text, 0, len(aa))
+		for i, item := range aa {
+			if i == 0 || !eq(item, aa[i-1]) {
+				rst = append(rst.([]text), item)
+			}
+		}
 	case []interface{}:
 		rst = make([]interface{}, 0, len(aa))
 		for i, item := range aa {
@@ -784,7 +918,7 @@ var unq = func(a interface{}) (rst interface{}) {
 	default:
 		panic("unq")
 	}
-	return rst
+	return
 }
 
 const (
@@ -796,6 +930,14 @@ const (
 
 var tp = func(a interface{}) (rst byte) {
 	switch aa := a.(type) {
+	case vector:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case text:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
 	case []int:
 		for i := 1; i < len(aa); i++ {
 			rst |= _tp(aa[i-1], aa[i])
@@ -841,6 +983,10 @@ var tp = func(a interface{}) (rst byte) {
 			rst |= _tp(aa[i-1], aa[i])
 		}
 	case []vector:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
+	case []text:
 		for i := 1; i < len(aa); i++ {
 			rst |= _tp(aa[i-1], aa[i])
 		}
@@ -866,6 +1012,16 @@ func _tp(a, b interface{}) byte {
 var bs = func(a, b interface{}, t byte) int {
 	_assert("bs", t&lgt < lgt)
 	switch aa := a.(type) {
+	case vector:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
+	case text:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
 	case []int:
 		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
 		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
@@ -926,6 +1082,11 @@ var bs = func(a, b interface{}, t byte) int {
 		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
 			return i
 		}
+	case []text:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
 	case []interface{}:
 		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
 		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
@@ -938,12 +1099,12 @@ var bs = func(a, b interface{}, t byte) int {
 }
 
 var fd = func(l, r, i int, check func(int) bool) int {
-	_assert("fd", l <= r, i != 0)
+	_assert("fd", i != 0)
 	inc := 1
 	if i < 0 {
 		l, r, i, inc = r, l, -i, -1
 	}
-	for j := l; j != r+inc; j += inc {
+	for j := l; (r-j)*inc >= 0; j += inc {
 		if i -= b2i(check(j)); i == 0 {
 			return j
 		}
@@ -1058,9 +1219,9 @@ var dijkstra = func(n int, g [][]pair, src int) []int {
 
 var tpSort = func(n int, g [][]pair, id []int) []int {
 	rst := make([]int, 0, n)
-	for i, d := range id {
+	for p, d := range id {
 		if d == 0 {
-			rst = append(rst, i)
+			rst = append(rst, p)
 		}
 	}
 	for i := 0; i < len(rst); i++ {
@@ -1133,13 +1294,13 @@ type text []byte
 
 func (t text) split(charSet string) (rst []string) {
 	_assert("text_split", len(charSet) > 0)
-	m := make(map[byte]struct{}, len(charSet))
+	var m [256]bool
 	for _, c := range text(charSet) {
-		m[c] = struct{}{}
+		m[c] = true
 	}
 	i := -1
 	for j, c := range append(t, charSet[0]) {
-		if _, ok := m[c]; !ok {
+		if !m[c] {
 			continue
 		}
 		if j > i+1 {
@@ -1150,12 +1311,11 @@ func (t text) split(charSet string) (rst []string) {
 	return
 }
 
-func (t text) counts() map[byte]int {
-	rst := make(map[byte]int, 256)
+func (t text) counts() (rst [256]int) {
 	for _, c := range t {
 		rst[c]++
 	}
-	return rst
+	return
 }
 
 type heap struct {
@@ -1233,6 +1393,15 @@ func (s *treeSet) contains(items ...interface{}) bool {
 		}
 	}
 	return true
+}
+
+func (s *treeSet) containsAny(items ...interface{}) bool {
+	for _, item := range items {
+		if _, found := s.Get(item); found {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *treeSet) Values() []interface{} {
@@ -1379,16 +1548,24 @@ func (s *multiSet) contains(items ...interface{}) bool {
 	return true
 }
 
+func (s *multiSet) containsAny(items ...interface{}) bool {
+	for _, item := range items {
+		if _, found := s.cnt.Get(item); found {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *multiSet) Clear() {
 	s.treeSet.Clear()
 	s.cnt.Clear()
 }
 
 func (s *multiSet) Values() []interface{} {
-	items := s.treeSet.Values()
-	rst := make([]interface{}, 0, len(items))
-	for _, item := range items {
-		rst = append(rst, item.(_item).val)
+	rst := make([]interface{}, s.Size())
+	for i, item := range s.treeSet.Values() {
+		rst[i] = item.(_item).val
 	}
 	return rst
 }
@@ -1421,6 +1598,14 @@ var hs = func(a interface{}) *hashset.Set {
 		return s
 	}
 	switch aa := a.(type) {
+	case vector:
+		for _, item := range aa {
+			s.Add(item)
+		}
+	case text:
+		for _, item := range aa {
+			s.Add(item)
+		}
 	case []int:
 		for _, item := range aa {
 			s.Add(item)
@@ -1524,12 +1709,12 @@ var (
 	_, _, _, _ = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _ = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _                         = prt, prf
+	_, _, _                      = prt, prf, plt
 	_, _, _                      = s2i, i2s, b2i
 	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
 	_, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, isPrime, factor
 	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _, _, _, _, _ = sz, pop, back, rvs, cp, cmp, cmp2, eq, srt, unq
+	_, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cp, cmp, cmp2, eq, srt, unq
 	_, _, _, _, _, _, _, _, _    = et, lt, gt, lgt, tp, bs, fd, lb, ub
 	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
@@ -1537,17 +1722,17 @@ var (
 	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
 )
 
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
-
-type TreeNode struct {
-	Val         int
-	Left, Right *TreeNode
-}
-
 const mod int = 1e9 + 7
+
+//type ListNode struct {
+//	Val  int
+//	Next *ListNode
+//}
+
+//type TreeNode struct {
+//	Val         int
+//	Left, Right *TreeNode
+//}
 
 //func init() {
 //	_initC(1000, 0)
