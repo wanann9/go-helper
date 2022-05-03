@@ -6,7 +6,6 @@ import (
 	"math"
 	"math/big"
 	"math/bits"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -348,6 +347,8 @@ var sz = func(a interface{}) (int, int) {
 
 var pop = func(a interface{}) (rst interface{}) {
 	switch aa := a.(type) {
+	case *string:
+		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *vector:
 		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
 	case *text:
@@ -388,6 +389,8 @@ var pop = func(a interface{}) (rst interface{}) {
 
 var elm = func(a interface{}, i int) interface{} {
 	switch aa := a.(type) {
+	case string:
+		return aa[(i+len(aa))%len(aa)]
 	case vector:
 		return aa[(i+len(aa))%len(aa)]
 	case text:
@@ -494,6 +497,21 @@ var rvs = func(a interface{}) {
 	default:
 		panic("rvs")
 	}
+}
+
+// string, vector, text
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
+// []interface{}
+var cpRvs = func(a interface{}) interface{} {
+	if aa, ok := a.(string); ok {
+		t := text(aa)
+		rvs(t)
+		return string(t)
+	}
+	rst := cp(a)
+	rvs(rst)
+	return rst
 }
 
 // int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
@@ -757,8 +775,27 @@ var eq = func(a, b interface{}) bool {
 //
 // []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
-var srt = func(a interface{}, comparator utils.Comparator) {
-	sort.Slice(a, _less(a, comparator))
+var srt = func(a interface{}, comparator utils.Comparator, stable bool) {
+	if stable {
+		sort.SliceStable(a, _less(a, comparator))
+	} else {
+		sort.Slice(a, _less(a, comparator))
+	}
+}
+
+// string, vector, text
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
+// []interface{}
+var cpSrt = func(a interface{}, comparator utils.Comparator, stable bool) interface{} {
+	if aa, ok := a.(string); ok {
+		t := text(aa)
+		srt(t, comparator, stable)
+		return string(t)
+	}
+	rst := cp(a)
+	srt(rst, comparator, stable)
+	return rst
 }
 
 func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
@@ -800,9 +837,15 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 	}
 }
 
-var unq = func(a interface{}) (rst interface{}) {
+// string, vector, text
+//
+// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
+// []interface{}
+func unq(a interface{}) (rst interface{}) {
 	_assert("unq", tp(a)&lgt < lgt)
 	switch aa := a.(type) {
+	case string:
+		rst = string(unq(text(aa)).(text))
 	case vector:
 		rst = make(vector, 0, len(aa))
 		for i, item := range aa {
@@ -930,6 +973,10 @@ const (
 
 var tp = func(a interface{}) (rst byte) {
 	switch aa := a.(type) {
+	case string:
+		for i := 1; i < len(aa); i++ {
+			rst |= _tp(aa[i-1], aa[i])
+		}
 	case vector:
 		for i := 1; i < len(aa); i++ {
 			rst |= _tp(aa[i-1], aa[i])
@@ -1012,6 +1059,11 @@ func _tp(a, b interface{}) byte {
 var bs = func(a, b interface{}, t byte) int {
 	_assert("bs", t&lgt < lgt)
 	switch aa := a.(type) {
+	case string:
+		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
+		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
+			return i
+		}
 	case vector:
 		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
 		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
@@ -1134,6 +1186,13 @@ var ub = func(l, r int, check func(int) bool) int {
 		}
 	}
 	return l
+}
+
+var cnt = func(l, r int, check func(int) bool) (rst int) {
+	for i := l; i <= r; i++ {
+		rst += b2i(check(i))
+	}
+	return
 }
 
 var (
@@ -1409,7 +1468,6 @@ func (s *treeSet) Values() []interface{} {
 }
 
 func (s *treeSet) intersection(another *treeSet) *treeSet {
-	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
 	rst := ts(s.Comparator)
 	for it := s.Iterator(); it.Next(); {
 		if item := it.Key(); another.contains(item) {
@@ -1420,7 +1478,6 @@ func (s *treeSet) intersection(another *treeSet) *treeSet {
 }
 
 func (s *treeSet) union(another *treeSet) *treeSet {
-	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
 	rst := ts(s.Comparator)
 	for it := s.Iterator(); it.Next(); {
 		rst.Put(it.Key())
@@ -1432,7 +1489,6 @@ func (s *treeSet) union(another *treeSet) *treeSet {
 }
 
 func (s *treeSet) difference(another *treeSet) *treeSet {
-	_assert(reflect.ValueOf(s.Comparator).Pointer() == reflect.ValueOf(another.Comparator).Pointer())
 	rst := ts(s.Comparator)
 	for it := s.Iterator(); it.Next(); {
 		if item := it.Key(); !another.contains(item) {
@@ -1598,6 +1654,10 @@ var hs = func(a interface{}) *hashset.Set {
 		return s
 	}
 	switch aa := a.(type) {
+	case string:
+		for _, item := range text(aa) {
+			s.Add(item)
+		}
 	case vector:
 		for _, item := range aa {
 			s.Add(item)
@@ -1709,17 +1769,17 @@ var (
 	_, _, _, _ = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _ = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _, _                      = prt, prf, plt
-	_, _, _                      = s2i, i2s, b2i
-	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
-	_, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, isPrime, factor
-	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cp, cmp, cmp2, eq, srt, unq
-	_, _, _, _, _, _, _, _, _    = et, lt, gt, lgt, tp, bs, fd, lb, ub
-	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
-	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
-	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
+	_, _, _                            = prt, prf, plt
+	_, _, _                            = s2i, i2s, b2i
+	_, _, _, _, _, _                   = isNumber, isLetter, isLower, isUpper, toLower, toUpper
+	_, _, _, _, _, _, _, _, _          = abs, min, max, pow, gcd, lcm, c, isPrime, factor
+	_, _, _, _, _, _                   = vct, mtx, cb, vctBool, mtxBool, cbBool
+	_, _, _, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cpRvs, cp, cmp, cmp2, eq, srt, cpSrt, unq
+	_, _, _, _, _, _, _, _, _, _       = et, lt, gt, lgt, tp, bs, fd, lb, ub, cnt
+	_, _, _, _, _, _, _, _, _          = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
+	_, _, _, _                         = pair{}, triplet{}, vector{}, text{}
+	_, _, _, _, _, _                   = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
+	_, _, _, _, _, _                   = hp, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7

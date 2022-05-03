@@ -4,6 +4,8 @@ import (
 	"math"
 	"math/rand"
 	"testing"
+
+	"github.com/emirpasic/gods/utils"
 )
 
 func Test_plt(t *testing.T) {
@@ -204,6 +206,24 @@ func Test_factor(t *testing.T) {
 	}
 }
 
+func Test_pop(t *testing.T) {
+	s := "abc"
+	t.Logf("%c", pop(&s))
+	t.Log(s)
+}
+
+func Test_cpRvs(t *testing.T) {
+	type args struct {
+		a interface{}
+	}
+	for _, a := range []*args{
+		{"abc"}, {text{'a', 'b', 'c'}},
+	} {
+		t.Log(cpRvs(a.a))
+		t.Log(a.a)
+	}
+}
+
 func Test_cp(t *testing.T) {
 	type args struct {
 		a interface{}
@@ -215,12 +235,32 @@ func Test_cp(t *testing.T) {
 	}
 }
 
+func Test_srt(t *testing.T) {
+	s := "acb"
+	srt(text(s), cmp, false)
+	t.Log(s)
+}
+
+func Test_cpSrt(t *testing.T) {
+	type args struct {
+		a          interface{}
+		comparator utils.Comparator
+		stable     bool
+	}
+	for _, a := range []*args{
+		{"acb", cmp2, false}, {text{'a', 'c', 'b'}, cmp2, false},
+	} {
+		t.Log(cpSrt(a.a, a.comparator, a.stable))
+		t.Log(a.a)
+	}
+}
+
 func Test_unq(t *testing.T) {
 	type args struct {
 		a interface{}
 	}
 	for _, a := range []*args{
-		{[]vector{{0}, {0, 1}, {0, 1}, {0, 1}, {1}, {1}, {1, 2}}},
+		{"aab"}, {[]vector{{0}, {0, 1}, {0, 1}, {0, 1}, {1}, {1}, {1, 2}}},
 	} {
 		t.Log(unq(a.a))
 	}
