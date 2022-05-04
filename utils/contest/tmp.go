@@ -74,38 +74,6 @@ func (t *trie) clear(prefix string) {
 
 }
 
-type strHash struct {
-	n, mod int
-	a, b   []int
-}
-
-var sh = func(s string, p, mod int) *strHash {
-	n := len(s)
-	_assert("sh", n > 0)
-	a, b := vct(n+1, 0), vct(n+1, 0)
-	b[0] = 1
-	for i := 1; i <= n; i++ {
-		a[i] = (a[i-1]*p + int(s[i-1])) % mod
-		b[i] = b[i-1] * p % mod
-	}
-	return &strHash{
-		n:   n,
-		mod: mod,
-		a:   a,
-		b:   b,
-	}
-}
-
-func (h *strHash) equal(l1, r1, l2, r2 int) bool {
-	_assert("strHash_equal",
-		l1 >= 0, l1 < h.n, r1 >= l1, r1 < h.n, l2 >= 0, l2 < h.n, r2 >= l2, r2 < h.n, r1-l1 == r2-l2)
-	return l1 == l2 || h.calc(l1, r1) == h.calc(l2, r2)
-}
-
-func (h *strHash) calc(l, r int) int {
-	return (h.a[r+1] - h.a[l]*h.b[r-l+1]%h.mod + h.mod) % h.mod
-}
-
 type unionFind struct {
 	size int
 	a    []int
