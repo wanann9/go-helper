@@ -74,35 +74,6 @@ func (t *trie) clear(prefix string) {
 
 }
 
-type unionFind struct {
-	size int
-	a    []int
-}
-
-var uf = func(size int) *unionFind {
-	a := vct(size, 0)
-	for i := range a {
-		a[i] = i
-	}
-	return &unionFind{
-		size: size,
-		a:    a,
-	}
-}
-
-func (f *unionFind) find(x int) int {
-	_assert("unionFind_find", x >= 0, x < f.size)
-	if f.a[x] != x {
-		f.a[x] = f.find(f.a[x])
-	}
-	return f.a[x]
-}
-
-func (f *unionFind) union(x, y int) {
-	_assert("unionFind_union", x >= 0, x < f.size, y >= 0, y < f.size)
-	f.a[f.find(x)] = f.find(y)
-}
-
 type segmentTree struct {
 	l, r    int
 	a, f, v []int
