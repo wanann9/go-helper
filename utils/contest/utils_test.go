@@ -333,13 +333,13 @@ func Test_treeMap(t *testing.T) {
 		m.Put(n, 10-n)
 	}
 	t.Log(m.Left(), m.Right())
-	it := m.IteratorAt(m.Left())
-	for it.Prev(); it.Next(); {
-		t.Log(it.Key(), it.Value())
-	}
-	for it.Prev() {
-		t.Log(it.Key(), it.Value())
-	}
+	//it := m.IteratorAt(m.Left())
+	//for it.Prev(); it.Next(); {
+	//	t.Log(it.Key(), it.Value())
+	//}
+	//for it.Prev() {
+	//	t.Log(it.Key(), it.Value())
+	//}
 }
 
 func Test_treeSet(t *testing.T) {
@@ -365,10 +365,10 @@ func Test_multiSet(t *testing.T) {
 }
 
 func Test_hs(t *testing.T) {
-	s1, s2 := hs([]pair{{0, 0}, {0, 1}}), hs([]pair{{0, 1}, {1, 0}})
-	t.Log(s1.Intersection(s2))
-	t.Log(s1.Union(s2))
-	t.Log(s1.Difference(s2))
+	//s1, s2 := hs([]pair{{0, 0}, {0, 1}}), hs([]pair{{0, 1}, {1, 0}})
+	//t.Log(s1.Intersection(s2))
+	//t.Log(s1.Union(s2))
+	//t.Log(s1.Difference(s2))
 }
 
 func Test_1(t *testing.T) {
