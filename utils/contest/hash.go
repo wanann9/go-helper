@@ -1,7 +1,6 @@
 package contest
 
 type hash struct {
-	n, m int
 	f    []pair
 	a, b [][]int
 }
@@ -13,18 +12,16 @@ var hsh = func(n int, elm func(int) int, factors ...pair) *hash {
 	for i := range v {
 		v[i] = elm(i)
 	}
-	m := len(factors)
-	a, b := mtx(n+1, m, 0), mtx(n+1, m, 0)
-	b[0] = vct(m, 1)
+	a, b, m := make([][]int, n+1), make([][]int, n+1), len(factors)
+	a[0], b[0] = vct(m, 0), vct(m, 1)
 	for i := 1; i <= n; i++ {
+		a[i], b[i] = vct(m, 0), vct(m, 0)
 		for j, f := range factors {
 			a[i][j] = (a[i-1][j]*f[0]%f[1] + v[i-1]%f[1]) % f[1]
 			b[i][j] = b[i-1][j] * f[0] % f[1]
 		}
 	}
 	return &hash{
-		n: n,
-		m: m,
 		f: factors,
 		a: a,
 		b: b,
@@ -32,7 +29,7 @@ var hsh = func(n int, elm func(int) int, factors ...pair) *hash {
 }
 
 func (h *hash) equal(h2 *hash, l, r, l2, r2 int) bool {
-	for i := 0; i < h.m; i++ {
+	for i := range h.f {
 		if h._calc(i, l, r) != h2._calc(i, l2, r2) {
 			return false
 		}
