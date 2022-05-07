@@ -221,10 +221,10 @@ func Test_cp(t *testing.T) {
 
 func Test_unq(t *testing.T) {
 	type args struct {
-		a interface{}
+		a []int
 	}
 	for _, a := range []*args{
-		{"aab"}, {[]vector{{0}, {0, 1}, {0, 1}, {0, 1}, {1}, {1}, {1, 2}}},
+		{[]int{0, 0, 0, 1, 1, 2}},
 	} {
 		t.Log(unq(a.a))
 	}
@@ -232,7 +232,7 @@ func Test_unq(t *testing.T) {
 
 func Test_tp(t *testing.T) {
 	type args struct {
-		a interface{}
+		a []int
 	}
 	for _, a := range []*args{
 		{[]int{0}},
@@ -249,8 +249,9 @@ func Test_tp(t *testing.T) {
 
 func Test_bs(t *testing.T) {
 	type args struct {
-		a, b interface{}
-		t    byte
+		a []int
+		b int
+		t byte
 	}
 	for _, a := range []*args{
 		{[]int{}, 0, 0},
@@ -292,7 +293,7 @@ func Test_srd(t *testing.T) {
 }
 
 func Test_treeMap(t *testing.T) {
-	m := tm(cmp)
+	m := tm(cmpInt)
 	for _, n := range rand.Perm(10) {
 		m.Put(n, 10-n)
 	}
@@ -307,7 +308,7 @@ func Test_treeMap(t *testing.T) {
 }
 
 func Test_treeSet(t *testing.T) {
-	s1, s2, s3 := ts(cmp), ts(cmp), ts(cmp2)
+	s1, s2, s3 := ts(cmpInt), ts(cmpInt), ts(rvsCmp(cmpInt))
 	s1.Put(1, 3, 5)
 	s2.Put(2, 3, 4, 5)
 	t.Log(s1.intersection(s2).Values())
@@ -318,13 +319,13 @@ func Test_treeSet(t *testing.T) {
 }
 
 func Test_multiSet(t *testing.T) {
-	s := mts(cmp)
+	s := mts(cmpPair)
 	for i := 0; i < 20; i++ {
-		s.Put(vector{i % 10, 10 - i%10})
+		s.Put(pair{i % 10, 10 - i%10})
 	}
 	t.Log(s.Values(), s.cnt.Values())
-	s.Remove(vector{0, 10}, vector{1, 9}, vector{1, 8})
-	s.removeAll(vector{2, 8}, vector{3, 7}, vector{3, 6})
+	s.Remove(pair{0, 10}, pair{1, 9}, pair{1, 8})
+	s.removeAll(pair{2, 8}, pair{3, 7}, pair{3, 6})
 	t.Log(s.Values(), s.cnt.Values())
 }
 

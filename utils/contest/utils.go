@@ -260,319 +260,48 @@ var cp = func(a []int) []int {
 	return rst
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-func cmp(a, b interface{}) int {
-	switch aa := a.(type) {
-	case int:
-		return utils.IntComparator(a, b)
-	case int64:
-		return utils.Int64Comparator(a, b)
-	case uint:
-		return utils.UIntComparator(a, b)
-	case uint64:
-		return utils.UInt64Comparator(a, b)
-	case byte:
-		return utils.ByteComparator(a, b)
-	case rune:
-		return utils.RuneComparator(a, b)
-	case float64:
-		return utils.Float64Comparator(a, b)
-	case bool:
-		return b2i(aa) - b2i(b.(bool))
-	case string:
-		return utils.StringComparator(a, b)
-	case pair:
-		bb := b.(pair)
+var unq = func(a []int) []int {
+	rst := make([]int, 0, len(a))
+	for i, n := range a {
+		if i == 0 || n != a[i-1] {
+			rst = append(rst, n)
+		}
+	}
+	return rst
+}
+
+var (
+	cmpInt     = utils.IntComparator
+	cmpInt64   = utils.Int64Comparator
+	cmpUint    = utils.UIntComparator
+	cmpUint64  = utils.UInt64Comparator
+	cmpByte    = utils.ByteComparator
+	cmpRune    = utils.RuneComparator
+	cmpFloat64 = utils.Float64Comparator
+	cmpBool    = func(a, b interface{}) int { return b2i(a.(bool)) - b2i(b.(bool)) }
+	cmpString  = utils.StringComparator
+	cmpPair    = func(a, b interface{}) int {
+		aa, bb := a.(pair), b.(pair)
 		for i := 0; i < 2; i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
+			if rst := cmpInt(aa[i], bb[i]); rst != 0 {
 				return rst
 			}
 		}
 		return 0
-	case triplet:
-		bb := b.(triplet)
+	}
+	cmpTriplet = func(a, b interface{}) int {
+		aa, bb := a.(triplet), b.(triplet)
 		for i := 0; i < 3; i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
+			if rst := cmpInt(aa[i], bb[i]); rst != 0 {
 				return rst
 			}
 		}
 		return 0
-	case vector:
-		bb := b.(vector)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case text:
-		bb := b.(text)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []int:
-		bb := b.([]int)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []int64:
-		bb := b.([]int64)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []uint:
-		bb := b.([]uint)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []uint64:
-		bb := b.([]uint64)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []byte:
-		bb := b.([]byte)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []rune:
-		bb := b.([]rune)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []float64:
-		bb := b.([]float64)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []bool:
-		bb := b.([]bool)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []string:
-		bb := b.([]string)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []pair:
-		bb := b.([]pair)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []triplet:
-		bb := b.([]triplet)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []vector:
-		bb := b.([]vector)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []text:
-		bb := b.([]text)
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	case []interface{}:
-		bb := b.([]interface{})
-		for i := 0; i < min(len(aa), len(bb)); i++ {
-			if rst := cmp(aa[i], bb[i]); rst != 0 {
-				return rst
-			}
-		}
-		return len(aa) - len(bb)
-	default:
-		panic("cmp")
 	}
-}
+)
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-var cmp2 = func(a, b interface{}) int {
-	return -cmp(a, b)
-}
-
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-var eq = func(a, b interface{}) bool {
-	return cmp(a, b) == 0
-}
-
-// string, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-func unq(a interface{}) (rst interface{}) {
-	switch aa := a.(type) {
-	case string:
-		rst = string(unq(text(aa)).(text))
-	case vector:
-		rst = make(vector, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.(vector), item)
-			}
-		}
-	case text:
-		rst = make(text, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.(text), item)
-			}
-		}
-	case []int:
-		rst = make([]int, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]int), item)
-			}
-		}
-	case []int64:
-		rst = make([]int64, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]int64), item)
-			}
-		}
-	case []uint:
-		rst = make([]uint, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]uint), item)
-			}
-		}
-	case []uint64:
-		rst = make([]uint64, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]uint64), item)
-			}
-		}
-	case []byte:
-		rst = make([]byte, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]byte), item)
-			}
-		}
-	case []rune:
-		rst = make([]rune, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]rune), item)
-			}
-		}
-	case []float64:
-		rst = make([]float64, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]float64), item)
-			}
-		}
-	case []bool:
-		rst = make([]bool, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]bool), item)
-			}
-		}
-	case []string:
-		rst = make([]string, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]string), item)
-			}
-		}
-	case []pair:
-		rst = make([]pair, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]pair), item)
-			}
-		}
-	case []triplet:
-		rst = make([]triplet, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]triplet), item)
-			}
-		}
-	case []vector:
-		rst = make([]vector, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]vector), item)
-			}
-		}
-	case []text:
-		rst = make([]text, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]text), item)
-			}
-		}
-	case []interface{}:
-		rst = make([]interface{}, 0, len(aa))
-		for i, item := range aa {
-			if i == 0 || !eq(item, aa[i-1]) {
-				rst = append(rst.([]interface{}), item)
-			}
-		}
-	default:
-		panic("unq")
-	}
-	return
+var rvsCmp = func(cmp utils.Comparator) utils.Comparator {
+	return func(a, b interface{}) int { return -cmp(a, b) }
 }
 
 const (
@@ -582,83 +311,14 @@ const (
 	lgt = lt | gt
 )
 
-var tp = func(a interface{}) (rst byte) {
-	switch aa := a.(type) {
-	case string:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case vector:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case text:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []int:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []int64:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []uint:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []uint64:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []byte:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []rune:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []float64:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []bool:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []string:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []pair:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []triplet:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []vector:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []text:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	case []interface{}:
-		for i := 1; i < len(aa); i++ {
-			rst |= _tp(aa[i-1], aa[i])
-		}
-	default:
-		panic("tp")
+var tp = func(a []int) (rst byte) {
+	for i := 1; i < len(a); i++ {
+		rst |= tp2(a[i-1], a[i], cmpInt)
 	}
 	return
 }
 
-func _tp(a, b interface{}) byte {
+var tp2 = func(a, b interface{}, cmp utils.Comparator) byte {
 	if rst := cmp(a, b); rst == 0 {
 		return et
 	} else if rst < 0 {
@@ -667,95 +327,10 @@ func _tp(a, b interface{}) byte {
 	return gt
 }
 
-var bs = func(a, b interface{}, t byte) int {
-	switch aa := a.(type) {
-	case string:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case vector:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case text:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []int:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []int64:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []uint:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []uint64:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []byte:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []rune:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []float64:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []bool:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []string:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []pair:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []triplet:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []vector:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []text:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	case []interface{}:
-		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
-		if i := lb(-1, len(aa), check); i >= 0 && i < len(aa) && eq(aa[i], b) {
-			return i
-		}
-	default:
-		panic("bs")
+var bs = func(a []int, b int, t byte) int {
+	check := func(i int) bool { return tp2(a[i], b, cmpInt)&t&lgt == 0 }
+	if i := lb(-1, len(a), check); i >= 0 && i < len(a) && cmpInt(a[i], b) == 0 {
+		return i
 	}
 	return -1
 }
@@ -862,7 +437,7 @@ var child = func(n int, parent []int) [][]int {
 }
 
 var dijkstra = func(n int, g [][]pair, src int) []int {
-	dist, visited, h := vct(n, -1), vctBool(n, false), hp(cmp)
+	dist, visited, h := vct(n, -1), vctBool(n, false), hp(cmpPair)
 	dist[src] = 0
 	h.Push(pair{0, src})
 	for !h.Empty() {
@@ -1355,17 +930,19 @@ var (
 	_, _, _, _    = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _    = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _                         = prt, prf
-	_, _, _                      = s2i, i2s, b2i
-	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
-	_, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, isPrime, factor
-	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cpRvs, cp, cmp, cmp2, eq, unq
-	_, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, bs, fd, lb, ub, cnt
-	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
-	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
-	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
+	_, _                            = prt, prf
+	_, _, _                         = s2i, i2s, b2i
+	_, _, _, _, _, _                = isNumber, isLetter, isLower, isUpper, toLower, toUpper
+	_, _, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor
+	_, _, _, _, _, _                = vct, mtx, cb, vctBool, mtxBool, cbBool
+	_, _, _, _, _, _, _             = sz, pop, elm, rvs, cpRvs, cp, unq
+	_, _, _, _, _, _                = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
+	_, _, _, _, _, _                = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
+	_, _, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, tp2, bs, fd, lb, ub, cnt
+	_, _, _, _, _, _, _, _, _       = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
+	_, _, _, _                      = pair{}, triplet{}, vector{}, text{}
+	_, _, _, _, _, _                = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
+	_, _, _, _, _, _                = hp, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7
