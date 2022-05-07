@@ -574,12 +574,165 @@ func (h *heap) Peek() interface{} {
 	return rst
 }
 
+type tmIterator struct {
+	tree *redblacktree.Tree
+	node *redblacktree.Node
+	pos  byte
+}
+
+const (
+	tmIterBegin byte = iota
+	tmIterBetween
+	tmIterEnd
+)
+
+var tmIter = func(tree *redblacktree.Tree, node *redblacktree.Node, pos byte) *tmIterator {
+	return &tmIterator{
+		tree: tree,
+		node: node,
+		pos:  pos,
+	}
+}
+
+func (it *tmIterator) next() bool {
+	if it.pos == tmIterEnd {
+		goto end
+	}
+	if it.pos == tmIterBegin {
+		left := it.tree.Left()
+		if left == nil {
+			goto end
+		}
+		it.node = left
+		goto between
+	}
+	if it.node.Right != nil {
+		it.node = it.node.Right
+		for it.node.Left != nil {
+			it.node = it.node.Left
+		}
+		goto between
+	}
+	for it.node.Parent != nil {
+		node := it.node
+		it.node = it.node.Parent
+		if node == it.node.Left {
+			goto between
+		}
+	}
+end:
+	it.end()
+	return false
+between:
+	it.pos = tmIterBetween
+	return true
+}
+
+func (it *tmIterator) prev() bool {
+	if it.pos == tmIterBegin {
+		goto begin
+	}
+	if it.pos == tmIterEnd {
+		right := it.tree.Right()
+		if right == nil {
+			goto begin
+		}
+		it.node = right
+		goto between
+	}
+	if it.node.Left != nil {
+		it.node = it.node.Left
+		for it.node.Right != nil {
+			it.node = it.node.Right
+		}
+		goto between
+	}
+	for it.node.Parent != nil {
+		node := it.node
+		it.node = it.node.Parent
+		if node == it.node.Right {
+			goto between
+		}
+	}
+begin:
+	it.begin()
+	return false
+between:
+	it.pos = tmIterBetween
+	return true
+}
+
+func (it *tmIterator) key() interface{} {
+	return it.node.Key
+}
+
+func (it *tmIterator) value() interface{} {
+	return it.node.Value
+}
+
+func (it *tmIterator) begin() {
+	it.node, it.pos = nil, tmIterBegin
+}
+
+func (it *tmIterator) end() {
+	it.node, it.pos = nil, tmIterEnd
+}
+
+func (it *tmIterator) first() bool {
+	it.begin()
+	return it.next()
+}
+
+func (it *tmIterator) last() bool {
+	it.end()
+	return it.prev()
+}
+
+func (it *tmIterator) nextTo(f func(key interface{}, value interface{}) bool) bool {
+	for it.next() {
+		if f(it.key(), it.value()) {
+			return true
+		}
+	}
+	return false
+}
+
+func (it *tmIterator) prevTo(f func(key interface{}, value interface{}) bool) bool {
+	for it.prev() {
+		if f(it.key(), it.value()) {
+			return true
+		}
+	}
+	return false
+}
+
 type treeMap struct {
 	*redblacktree.Tree
 }
 
 var tm = func(comparator utils.Comparator) *treeMap {
 	return &treeMap{redblacktree.NewWith(comparator)}
+}
+
+func (m *treeMap) getNode(key interface{}) *redblacktree.Node {
+	for p := m.Root; p != nil; {
+		if rst := m.Comparator(key, p.Key); rst == 0 {
+			return p
+		} else if rst < 0 {
+			p = p.Left
+		} else {
+			p = p.Right
+		}
+	}
+	return nil
+}
+
+func (m *treeMap) iterator() *tmIterator {
+	return tmIter(m.Tree, nil, tmIterBegin)
+}
+
+func (m *treeMap) iteratorAt(node *redblacktree.Node) *tmIterator {
+	return tmIter(m.Tree, node, tmIterBetween)
 }
 
 func (m *treeMap) Floor(x interface{}) *redblacktree.Node {
@@ -712,40 +865,25 @@ var mts = func(comparator utils.Comparator) *multiSet {
 
 func (s *multiSet) Put(items ...interface{}) {
 	for _, item := range items {
-		//if node := s.cnt.GetNode(item); node != nil {
-		//	cnt := node.Value.(int)
-		//	s.treeSet.Put(mtsItem{item, cnt})
-		//	node.Value = cnt + 1
-		//} else {
-		//	s.treeSet.Put(mtsItem{item, 0})
-		//	s.cnt.Put(item, 1)
-		//}
-		cnt := 0
-		if val, found := s.cnt.Get(item); found {
-			cnt = val.(int)
+		if node := s.cnt.getNode(item); node != nil {
+			cnt := node.Value.(int)
+			s.treeSet.Put(mtsItem{item, cnt})
+			node.Value = cnt + 1
+		} else {
+			s.treeSet.Put(mtsItem{item, 0})
+			s.cnt.Put(item, 1)
 		}
-		s.treeSet.Put(mtsItem{item, cnt})
-		s.cnt.Put(item, cnt+1)
 	}
 }
 
 func (s *multiSet) Remove(items ...interface{}) {
 	for _, item := range items {
-		//if node := s.cnt.GetNode(item); node != nil {
-		//	cnt := node.Value.(int)
-		//	if cnt--; cnt == 0 {
-		//		s.cnt.Remove(item)
-		//	} else {
-		//		node.Value = cnt
-		//	}
-		//	s.treeSet.Remove(mtsItem{item, cnt})
-		//}
-		if val, found := s.cnt.Get(item); found {
-			cnt := val.(int)
+		if node := s.cnt.getNode(item); node != nil {
+			cnt := node.Value.(int)
 			if cnt--; cnt == 0 {
 				s.cnt.Remove(item)
 			} else {
-				s.cnt.Put(item, cnt)
+				node.Value = cnt
 			}
 			s.treeSet.Remove(mtsItem{item, cnt})
 		}
@@ -972,8 +1110,8 @@ var (
 	_, _, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, tp2, bs, fd, lb, ub, cnt
 	_, _, _, _, _, _, _, _, _       = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                      = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _                = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
-	_, _, _, _, _, _                = hp, tm, ts, mts, hs, dq
+	_, _, _, _, _, _, _             = heap{}, tmIterator{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
+	_, _, _, _, _, _, _, _, _, _    = hp, tmIterBegin, tmIterBetween, tmIterEnd, tmIter, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7
