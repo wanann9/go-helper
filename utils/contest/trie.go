@@ -1,4 +1,4 @@
-package contest
+package main
 
 type trieNode struct {
 	children       []*trieNode

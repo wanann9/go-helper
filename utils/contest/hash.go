@@ -1,4 +1,4 @@
-package contest
+package main
 
 type hash struct {
 	f    []pair

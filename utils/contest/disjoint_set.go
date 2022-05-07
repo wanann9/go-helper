@@ -1,4 +1,4 @@
-package contest
+package main
 
 type disjointSet struct {
 	a, b []int
