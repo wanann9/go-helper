@@ -208,27 +208,27 @@ var cbBool = func(l1, l2, l3 int, init bool) [][][]bool {
 }
 
 var sz = func(a interface{}) (int, int) {
-	switch aa := a.(type) {
+	switch a := a.(type) {
 	case [][]int:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]int64:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]uint:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]uint64:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]byte:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]rune:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]float64:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]bool:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case [][]string:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	case []string:
-		return len(aa), len(aa[0])
+		return len(a), len(a[0])
 	default:
 		panic("sz")
 	}
