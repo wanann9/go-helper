@@ -105,11 +105,10 @@ var pow = func(a, b, mod int) (rst int) {
 	return
 }
 
-func gcd(a, b int) int {
-	if a%b == 0 {
-		return b
+var gcd = func(a, b int) int {
+	for ; a%b != 0; a, b = b, a%b {
 	}
-	return gcd(b, a%b)
+	return b
 }
 
 var lcm = func(a, b int) int {
