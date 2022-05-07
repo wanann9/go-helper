@@ -254,8 +254,8 @@ var cpRvs = func(a []int) []int {
 	return rst
 }
 
-func cp(a []int) []int {
-	rst := make([]int, len(a))
+var cp = func(a []int) []int {
+	rst := vct(len(a), 0)
 	copy(rst, a)
 	return rst
 }
