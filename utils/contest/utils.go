@@ -118,7 +118,7 @@ var lcm = func(a, b int) int {
 
 var c [][]int
 
-func _initC(n, mod int) {
+var initC = func(n, mod int) {
 	c = mtx(n+1, n+1, 0)
 	for i := 0; i <= n; i++ {
 		c[i][0] = 1
@@ -1582,5 +1582,5 @@ const mod int = 1e9 + 7
 //}
 
 //func init() {
-//	_initC(1000, 0)
+//	initC(1000, 0)
 //}

@@ -166,7 +166,7 @@ func Test_lcm(t *testing.T) {
 }
 
 func Test_c(t *testing.T) {
-	_initC(6, 0)
+	initC(6, 0)
 	t.Log(c)
 }
 
