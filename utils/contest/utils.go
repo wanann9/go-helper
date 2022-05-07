@@ -234,87 +234,13 @@ var sz = func(a interface{}) (int, int) {
 	}
 }
 
-var pop = func(a interface{}) (rst interface{}) {
-	switch aa := a.(type) {
-	case *string:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *vector:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *text:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]int:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]int64:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]uint:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]uint64:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]byte:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]rune:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]float64:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]bool:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]string:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]pair:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]triplet:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]vector:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]text:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	case *[]interface{}:
-		rst, *aa = elm(*aa, -1), (*aa)[:len(*aa)-1]
-	default:
-		panic("pop")
-	}
+var pop = func(a *[]int) (rst int) {
+	rst, *a = elm(*a, -1), (*a)[:len(*a)-1]
 	return
 }
 
-var elm = func(a interface{}, i int) interface{} {
-	switch aa := a.(type) {
-	case string:
-		return aa[(i+len(aa))%len(aa)]
-	case vector:
-		return aa[(i+len(aa))%len(aa)]
-	case text:
-		return aa[(i+len(aa))%len(aa)]
-	case []int:
-		return aa[(i+len(aa))%len(aa)]
-	case []int64:
-		return aa[(i+len(aa))%len(aa)]
-	case []uint:
-		return aa[(i+len(aa))%len(aa)]
-	case []uint64:
-		return aa[(i+len(aa))%len(aa)]
-	case []byte:
-		return aa[(i+len(aa))%len(aa)]
-	case []rune:
-		return aa[(i+len(aa))%len(aa)]
-	case []float64:
-		return aa[(i+len(aa))%len(aa)]
-	case []bool:
-		return aa[(i+len(aa))%len(aa)]
-	case []string:
-		return aa[(i+len(aa))%len(aa)]
-	case []pair:
-		return aa[(i+len(aa))%len(aa)]
-	case []triplet:
-		return aa[(i+len(aa))%len(aa)]
-	case []vector:
-		return aa[(i+len(aa))%len(aa)]
-	case []text:
-		return aa[(i+len(aa))%len(aa)]
-	case []interface{}:
-		return aa[(i+len(aa))%len(aa)]
-	default:
-		panic("elm")
-	}
+var elm = func(a []int, i int) int {
+	return a[(i+len(a))%len(a)]
 }
 
 var rvs = func(a interface{}) {

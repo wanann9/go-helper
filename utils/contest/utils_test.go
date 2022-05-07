@@ -193,9 +193,9 @@ func Test_factor(t *testing.T) {
 }
 
 func Test_pop(t *testing.T) {
-	s := "abc"
-	t.Logf("%c", pop(&s))
-	t.Log(s)
+	a := []int{0, 1, 2}
+	t.Log(pop(&a))
+	t.Log(a)
 }
 
 func Test_cpRvs(t *testing.T) {
