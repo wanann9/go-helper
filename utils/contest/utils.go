@@ -16,21 +16,6 @@ import (
 	"github.com/emirpasic/gods/utils"
 )
 
-func _assert(info interface{}, conditions ...bool) {
-	for _, condition := range conditions {
-		if !condition {
-			panic(info)
-		}
-	}
-}
-
-func _ternary(condition bool, a, b int) int {
-	if condition {
-		return a
-	}
-	return b
-}
-
 var prt, prf = fmt.Println, fmt.Printf
 
 var plt = func(a interface{}) {
@@ -102,7 +87,10 @@ var i2s = func(i, base int) string {
 }
 
 var b2i = func(b bool) int {
-	return _ternary(b, 1, 0)
+	if b {
+		return 1
+	}
+	return 0
 }
 
 var isNumber = func(a interface{}) bool {
@@ -177,29 +165,33 @@ var toUpper = func(a interface{}) byte {
 }
 
 var abs = func(a int) int {
-	return _ternary(a >= 0, a, -a)
+	if a >= 0 {
+		return a
+	}
+	return -a
 }
 
 var min = func(nums ...int) int {
-	_assert("min", len(nums) > 0)
 	rst := math.MaxInt
 	for _, n := range nums {
-		rst = _ternary(n < rst, n, rst)
+		if n < rst {
+			rst = n
+		}
 	}
 	return rst
 }
 
 var max = func(nums ...int) int {
-	_assert("max", len(nums) > 0)
 	rst := math.MinInt
 	for _, n := range nums {
-		rst = _ternary(n > rst, n, rst)
+		if n > rst {
+			rst = n
+		}
 	}
 	return rst
 }
 
 var pow = func(a, b, mod int) (rst int) {
-	_assert("pow", b >= 0, a != 0 || b != 0)
 	for rst = 1; b > 0; b >>= 1 {
 		if b&1 != 0 {
 			if rst *= a; mod > 1 {
@@ -214,7 +206,6 @@ var pow = func(a, b, mod int) (rst int) {
 }
 
 func gcd(a, b int) int {
-	_assert("gcd", a > 0, b > 0)
 	if a%b == 0 {
 		return b
 	}
@@ -240,7 +231,6 @@ func _initC(n, mod int) {
 }
 
 var isPrime = func(n int) bool {
-	_assert("isPrime", n >= 0)
 	if n <= 1 {
 		return false
 	}
@@ -253,7 +243,6 @@ var isPrime = func(n int) bool {
 }
 
 var factor = func(n int) map[int]int {
-	_assert("factor", n >= 0)
 	rst := make(map[int]int)
 	for i := 2; i*i <= n; i++ {
 		for ; n%i == 0; n /= i {
@@ -842,7 +831,6 @@ func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
 // []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
 // []interface{}
 func unq(a interface{}) (rst interface{}) {
-	_assert("unq", tp(a)&lgt < lgt)
 	switch aa := a.(type) {
 	case string:
 		rst = string(unq(text(aa)).(text))
@@ -1057,7 +1045,6 @@ func _tp(a, b interface{}) byte {
 }
 
 var bs = func(a, b interface{}, t byte) int {
-	_assert("bs", t&lgt < lgt)
 	switch aa := a.(type) {
 	case string:
 		check := func(i int) bool { return _tp(aa[i], b)&t&lgt == 0 }
@@ -1151,7 +1138,6 @@ var bs = func(a, b interface{}, t byte) int {
 }
 
 var fd = func(l, r, i int, check func(int) bool) int {
-	_assert("fd", i != 0)
 	inc := 1
 	if i < 0 {
 		l, r, i, inc = r, l, -i, -1
@@ -1165,7 +1151,6 @@ var fd = func(l, r, i int, check func(int) bool) int {
 }
 
 var lb = func(l, r int, check func(int) bool) int {
-	_assert("lb", l < r)
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			r = m
@@ -1177,7 +1162,6 @@ var lb = func(l, r int, check func(int) bool) int {
 }
 
 var ub = func(l, r int, check func(int) bool) int {
-	_assert("ub", l < r)
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			l = m
@@ -1201,7 +1185,6 @@ var (
 )
 
 var srd = func(m, n, i, j int, drt []pair) []pair {
-	_assert("srd", in(i, j, 0, 0, m-1, n-1))
 	rst := make([]pair, 0, len(drt))
 	for _, d := range drt {
 		if x, y := i+d[0], j+d[1]; in(x, y, 0, 0, m-1, n-1) {
@@ -1212,7 +1195,6 @@ var srd = func(m, n, i, j int, drt []pair) []pair {
 }
 
 var in = func(i, j, x1, y1, x2, y2 int) bool {
-	_assert("in", x1 <= x2, y1 <= y2)
 	return i >= x1 && i <= x2 && j >= y1 && j <= y2
 }
 
@@ -1352,7 +1334,6 @@ func (v vector) counts() map[int]int {
 type text []byte
 
 func (t text) split(charSet string) (rst []string) {
-	_assert("text_split", len(charSet) > 0)
 	var m [256]bool
 	for _, c := range text(charSet) {
 		m[c] = true
@@ -1386,13 +1367,11 @@ var hp = func(comparator utils.Comparator) *heap {
 }
 
 func (h *heap) Pop() interface{} {
-	_assert("heap_Pop", !h.Empty())
 	rst, _ := h.Heap.Pop()
 	return rst
 }
 
 func (h *heap) Peek() interface{} {
-	_assert("heap_Peek", !h.Empty())
 	rst, _ := h.Heap.Peek()
 	return rst
 }
@@ -1403,16 +1382,6 @@ type treeMap struct {
 
 var tm = func(comparator utils.Comparator) *treeMap {
 	return &treeMap{redblacktree.NewWith(comparator)}
-}
-
-func (m *treeMap) Left() *redblacktree.Node {
-	_assert("treeMap_Left", !m.Empty())
-	return m.Tree.Left()
-}
-
-func (m *treeMap) Right() *redblacktree.Node {
-	_assert("treeMap_Right", !m.Empty())
-	return m.Tree.Right()
 }
 
 func (m *treeMap) Floor(x interface{}) *redblacktree.Node {
@@ -1534,8 +1503,10 @@ var mts = func(comparator utils.Comparator) *multiSet {
 	return &multiSet{
 		treeSet: ts(func(a, b interface{}) int {
 			aa, bb := a.(_item), b.(_item)
-			key := comparator(aa.val, bb.val)
-			return _ternary(key != 0, key, aa.idx-bb.idx)
+			if rst := comparator(aa.val, bb.val); rst != 0 {
+				return rst
+			}
+			return aa.idx - bb.idx
 		}),
 		cnt: tm(comparator),
 	}
@@ -1728,16 +1699,6 @@ var dq = func() *deque {
 
 func (q *deque) empty() bool {
 	return q.Len() == 0
-}
-
-func (q *deque) Front() *list.Element {
-	_assert("deque_Front", !q.empty())
-	return q.List.Front()
-}
-
-func (q *deque) Back() *list.Element {
-	_assert("deque_Back", !q.empty())
-	return q.List.Back()
 }
 
 func (q *deque) popFront() interface{} {
