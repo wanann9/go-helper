@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math"
 	"math/rand"
 	"testing"
 )
@@ -308,13 +307,13 @@ func Test_treeMap(t *testing.T) {
 }
 
 func Test_treeSet(t *testing.T) {
-	s1, s2, s3 := ts(cmpInt), ts(cmpInt), ts(rvsCmp(cmpInt))
+	s1, s2, s3 := ts(cmpInt), ts(cmpInt), ts(rvsCmp(cmpPair))
 	s1.Put(1, 3, 5)
 	s2.Put(2, 3, 4, 5)
 	t.Log(s1.intersection(s2).Values())
 	t.Log(s1.union(s2).Values())
 	t.Log(s1.difference(s2).Values())
-	s3.Put(vector{1, 2}, vector{2, 3})
+	s3.Put(pair{1, 2}, pair{2, 3})
 	t.Log(s3.Values())
 }
 
@@ -334,19 +333,4 @@ func Test_hashSet(t *testing.T) {
 	t.Log(s1.intersection(s2))
 	t.Log(s1.union(s2))
 	t.Log(s1.difference(s2))
-}
-
-func Test_1(t *testing.T) {
-	for x := int(1e7); x > 1; x-- {
-		if isPrime(x) {
-			t.Log(x)
-			break
-		}
-	}
-	for x := int(1e7); x <= math.MaxInt; x++ {
-		if isPrime(x) {
-			t.Log(x)
-			break
-		}
-	}
 }

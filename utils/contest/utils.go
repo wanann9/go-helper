@@ -329,7 +329,7 @@ var tp2 = func(a, b interface{}, cmp utils.Comparator) byte {
 
 var bs = func(a []int, b int, t byte) int {
 	check := func(i int) bool { return tp2(a[i], b, cmpInt)&t&lgt == 0 }
-	if i := lb(-1, len(a), check); i >= 0 && i < len(a) && cmpInt(a[i], b) == 0 {
+	if i := lb(-1, len(a), check); i >= 0 && i < len(a) && a[i] == b {
 		return i
 	}
 	return -1
@@ -560,8 +560,8 @@ type heap struct {
 	*binaryheap.Heap
 }
 
-var hp = func(comparator utils.Comparator) *heap {
-	return &heap{binaryheap.NewWith(comparator)}
+var hp = func(cmp utils.Comparator) *heap {
+	return &heap{binaryheap.NewWith(cmp)}
 }
 
 func (h *heap) Pop() interface{} {
@@ -710,8 +710,8 @@ type treeMap struct {
 	*redblacktree.Tree
 }
 
-var tm = func(comparator utils.Comparator) *treeMap {
-	return &treeMap{redblacktree.NewWith(comparator)}
+var tm = func(cmp utils.Comparator) *treeMap {
+	return &treeMap{redblacktree.NewWith(cmp)}
 }
 
 func (m *treeMap) getNode(key interface{}) *redblacktree.Node {
@@ -749,8 +749,8 @@ type treeSet struct {
 	*treeMap
 }
 
-var ts = func(comparator utils.Comparator) *treeSet {
-	return &treeSet{tm(comparator)}
+var ts = func(cmp utils.Comparator) *treeSet {
+	return &treeSet{tm(cmp)}
 }
 
 func (s *treeSet) Put(items ...interface{}) {
@@ -789,8 +789,8 @@ func (s *treeSet) Values() []interface{} {
 
 func (s *treeSet) intersection(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.Iterator(); it.Next(); {
-		if item := it.Key(); another.contains(item) {
+	for it := s.iterator(); it.next(); {
+		if item := it.key(); another.contains(item) {
 			rst.Put(item)
 		}
 	}
@@ -799,19 +799,19 @@ func (s *treeSet) intersection(another *treeSet) *treeSet {
 
 func (s *treeSet) union(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.Iterator(); it.Next(); {
-		rst.Put(it.Key())
+	for it := s.iterator(); it.next(); {
+		rst.Put(it.key())
 	}
-	for it := another.Iterator(); it.Next(); {
-		rst.Put(it.Key())
+	for it := another.iterator(); it.next(); {
+		rst.Put(it.key())
 	}
 	return rst
 }
 
 func (s *treeSet) difference(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.Iterator(); it.Next(); {
-		if item := it.Key(); !another.contains(item) {
+	for it := s.iterator(); it.next(); {
+		if item := it.key(); !another.contains(item) {
 			rst.Put(item)
 		}
 	}
@@ -850,16 +850,16 @@ type mtsItem struct {
 	idx int
 }
 
-var mts = func(comparator utils.Comparator) *multiSet {
+var mts = func(cmp utils.Comparator) *multiSet {
 	return &multiSet{
 		treeSet: ts(func(a, b interface{}) int {
 			aa, bb := a.(mtsItem), b.(mtsItem)
-			if rst := comparator(aa.val, bb.val); rst != 0 {
+			if rst := cmp(aa.val, bb.val); rst != 0 {
 				return rst
 			}
 			return aa.idx - bb.idx
 		}),
-		cnt: tm(comparator),
+		cnt: tm(cmp),
 	}
 }
 
