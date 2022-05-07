@@ -17,62 +17,62 @@ var smt = func(a []int) *segmentTree {
 		a:     a,
 		nodes: make([]smtNode, n<<2+1),
 	}
-	t._build(1, 0, n-1)
+	t.build(1, 0, n-1)
 	return t
 }
 
-func (t *segmentTree) _build(i, l, r int) {
+func (t *segmentTree) build(i, l, r int) {
 	if l == r {
 		t.nodes[i].f = t.a[l]
 		return
 	}
 	m, i1, i2 := l+(r-l)>>1, i<<1, i<<1+1
-	t._build(i1, l, m)
-	t._build(i2, m+1, r)
+	t.build(i1, l, m)
+	t.build(i2, m+1, r)
 	t.nodes[i].f = t.nodes[i1].f + t.nodes[i2].f
 }
 
 func (t *segmentTree) update(x, y, k int) {
-	t._update(1, 0, t.n-1, x, y, k)
+	t.update2(1, 0, t.n-1, x, y, k)
 }
 
-func (t *segmentTree) _update(i, l, r, x, y, k int) {
+func (t *segmentTree) update2(i, l, r, x, y, k int) {
 	if x <= l && y >= r {
 		t.nodes[i].v += k
 		return
 	}
 	m, i1, i2 := l+(r-l)>>1, i<<1, i<<1+1
-	t._down(i, i1, i2, l, m, r)
+	t.down(i, i1, i2, l, m, r)
 	if x <= m {
-		t._update(i1, l, m, x, y, k)
+		t.update2(i1, l, m, x, y, k)
 	}
 	if y > m {
-		t._update(i2, m+1, r, x, y, k)
+		t.update2(i2, m+1, r, x, y, k)
 	}
-	t._up(i, i1, i2, l, m, r)
+	t.up(i, i1, i2, l, m, r)
 }
 
 func (t *segmentTree) calc(x, y int) int {
-	return t._calc(1, 0, t.n-1, x, y)
+	return t.calc2(1, 0, t.n-1, x, y)
 }
 
-func (t *segmentTree) _calc(i, l, r, x, y int) (rst int) {
+func (t *segmentTree) calc2(i, l, r, x, y int) (rst int) {
 	if x <= l && y >= r {
 		return t.nodes[i].f + t.nodes[i].v*(r-l+1)
 	}
 	m, i1, i2 := l+(r-l)>>1, i<<1, i<<1+1
-	t._down(i, i1, i2, l, m, r)
+	t.down(i, i1, i2, l, m, r)
 	if x <= m {
-		rst += t._calc(i1, l, m, x, y)
+		rst += t.calc2(i1, l, m, x, y)
 	}
 	if y > m {
-		rst += t._calc(i2, m+1, r, x, y)
+		rst += t.calc2(i2, m+1, r, x, y)
 	}
-	t._up(i, i1, i2, l, m, r)
+	t.up(i, i1, i2, l, m, r)
 	return
 }
 
-func (t *segmentTree) _down(i, i1, i2, l, m, r int) {
+func (t *segmentTree) down(i, i1, i2, l, m, r int) {
 	if v := t.nodes[i].v; v != 0 {
 		t.nodes[i1].v += v
 		t.nodes[i2].v += v
@@ -80,6 +80,6 @@ func (t *segmentTree) _down(i, i1, i2, l, m, r int) {
 	}
 }
 
-func (t *segmentTree) _up(i, i1, i2, l, m, r int) {
+func (t *segmentTree) up(i, i1, i2, l, m, r int) {
 	t.nodes[i].f = t.nodes[i1].f + t.nodes[i1].v*(m-l+1) + t.nodes[i2].f + t.nodes[i2].v*(r-m)
 }

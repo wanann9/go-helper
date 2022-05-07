@@ -106,7 +106,7 @@ var tr01 = func(bits int) *trie01 {
 	}
 }
 
-func (t *trie01) _parse(n int) []int {
+func (t *trie01) parse(n int) []int {
 	rst := vct(t.bits, 0)
 	for i := t.bits - 1; n > 0; n, i = n>>1, i-1 {
 		rst[i] = n & 1
@@ -116,7 +116,7 @@ func (t *trie01) _parse(n int) []int {
 
 func (t *trie01) insert(n, cnt int) *trieNode01 {
 	p := t.root
-	for _, i := range t._parse(n) {
+	for _, i := range t.parse(n) {
 		if p.subCnt += cnt; p.children[i] == nil {
 			p.children[i] = trn01(p)
 		}
@@ -129,7 +129,7 @@ func (t *trie01) insert(n, cnt int) *trieNode01 {
 
 func (t *trie01) search(n int) *trieNode01 {
 	p := t.root
-	for _, i := range t._parse(n) {
+	for _, i := range t.parse(n) {
 		if p = p.children[i]; p == nil {
 			return nil
 		}
@@ -159,7 +159,7 @@ func (t *trie01) query(n int) (p *trieNode01, a int) {
 	if p, a = t.root, 0; p.subCnt == 0 {
 		return nil, 0
 	}
-	for _, i := range t._parse(n) {
+	for _, i := range t.parse(n) {
 		j := i ^ 1
 		if q := p.children[j]; q == nil || q.curCnt+q.subCnt == 0 {
 			j = i
@@ -173,7 +173,7 @@ func (t *trie01) query(n int) (p *trieNode01, a int) {
 //	if p, a = t.root, 0; p.subCnt == 0 {
 //		return nil, 0
 //	}
-//	for _, i := range t._parse(n) {
+//	for _, i := range t.parse(n) {
 //		j := i ^ 1
 //		if q := p.children[j]; q == nil || q.min > m {
 //			if j = i; p.children[j].min > m {

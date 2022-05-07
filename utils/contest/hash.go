@@ -30,13 +30,13 @@ var hsh = func(n int, elm func(int) int, factors ...pair) *hash {
 
 func (h *hash) equal(h2 *hash, l, r, l2, r2 int) bool {
 	for i := range h.f {
-		if h._calc(i, l, r) != h2._calc(i, l2, r2) {
+		if h.calc(i, l, r) != h2.calc(i, l2, r2) {
 			return false
 		}
 	}
 	return true
 }
 
-func (h *hash) _calc(i, l, r int) int {
+func (h *hash) calc(i, l, r int) int {
 	return (h.a[r+1][i] - h.a[l][i]*h.b[r-l+1][i]%h.f[i][1] + h.f[i][1]) % h.f[i][1]
 }
