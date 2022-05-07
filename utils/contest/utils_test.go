@@ -329,11 +329,11 @@ func Test_multiSet(t *testing.T) {
 	t.Log(s.Values(), s.cnt.Values())
 }
 
-func Test_hs(t *testing.T) {
-	//s1, s2 := hs([]pair{{0, 0}, {0, 1}}), hs([]pair{{0, 1}, {1, 0}})
-	//t.Log(s1.Intersection(s2))
-	//t.Log(s1.Union(s2))
-	//t.Log(s1.Difference(s2))
+func Test_hashSet(t *testing.T) {
+	s1, s2 := hs([]pair{{0, 0}, {0, 1}}), hs([]pair{{0, 1}, {1, 0}})
+	t.Log(s1.intersection(s2))
+	t.Log(s1.union(s2))
+	t.Log(s1.difference(s2))
 }
 
 func Test_1(t *testing.T) {

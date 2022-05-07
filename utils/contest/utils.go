@@ -817,8 +817,12 @@ func (s *multiSet) ceiling(x interface{}) interface{} {
 	return nil
 }
 
-var hs = func(a interface{}) *hashset.Set {
-	s := hashset.New()
+type hashSet struct {
+	*hashset.Set
+}
+
+var hs = func(a interface{}) *hashSet {
+	s := &hashSet{hashset.New()}
 	if a == nil {
 		return s
 	}
@@ -887,6 +891,33 @@ var hs = func(a interface{}) *hashset.Set {
 	return s
 }
 
+func (s *hashSet) intersection(another *hashSet) *hashSet {
+	rst := hs(nil)
+	for _, item := range s.Values() {
+		if another.Contains(item) {
+			rst.Add(item)
+		}
+	}
+	return rst
+}
+
+func (s *hashSet) union(another *hashSet) *hashSet {
+	rst := hs(nil)
+	rst.Add(s.Values()...)
+	rst.Add(another.Values()...)
+	return rst
+}
+
+func (s *hashSet) difference(another *hashSet) *hashSet {
+	rst := hs(nil)
+	for _, item := range s.Values() {
+		if !another.Contains(item) {
+			rst.Add(item)
+		}
+	}
+	return rst
+}
+
 type deque struct {
 	*list.List
 }
@@ -941,7 +972,7 @@ var (
 	_, _, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, tp2, bs, fd, lb, ub, cnt
 	_, _, _, _, _, _, _, _, _       = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                      = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _                = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
+	_, _, _, _, _, _                = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
 	_, _, _, _, _, _                = hp, tm, ts, mts, hs, dq
 )
 
