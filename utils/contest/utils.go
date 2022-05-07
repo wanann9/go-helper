@@ -18,62 +18,6 @@ import (
 
 var prt, prf = fmt.Println, fmt.Printf
 
-var plt = func(a interface{}) {
-	var l []string
-	switch aa := a.(type) {
-	case [][]int:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]int64:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]uint:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]uint64:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]byte:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = string(v)
-		}
-	case [][]rune:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = string(v)
-		}
-	case [][]float64:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]bool:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprint(v)
-		}
-	case [][]string:
-		l = make([]string, len(aa))
-		for i, v := range aa {
-			l[i] = fmt.Sprintf("%q", v)
-		}
-	case []string:
-		l = aa
-	default:
-		panic("plt")
-	}
-	_, _ = prt("[" + strings.Join(l, "\n ") + "]")
-}
-
 var s2i = func(s string, base int) int {
 	rst, err := strconv.ParseInt(s, base, 64)
 	if err != nil {
@@ -1730,7 +1674,7 @@ var (
 	_, _, _, _ = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _ = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _, _                            = prt, prf, plt
+	_, _                               = prt, prf
 	_, _, _                            = s2i, i2s, b2i
 	_, _, _, _, _, _                   = isNumber, isLetter, isLower, isUpper, toLower, toUpper
 	_, _, _, _, _, _, _, _, _          = abs, min, max, pow, gcd, lcm, c, isPrime, factor
