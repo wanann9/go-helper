@@ -44,61 +44,57 @@ func Test_b2i(t *testing.T) {
 
 func Test_isNumber(t *testing.T) {
 	type args struct {
-		a interface{}
+		c byte
 	}
 	for _, a := range []*args{
 		{byte('0')}, {byte('9')}, {byte('a')},
-		{'0'}, {'9'}, {'a'},
 	} {
-		t.Log(isNumber(a.a))
+		t.Log(isNumber(a.c))
 	}
 }
 
 func Test_isLetter(t *testing.T) {
 	type args struct {
-		a interface{}
+		c byte
 	}
 	for _, a := range []*args{
 		{byte('a')}, {byte('z')}, {byte('A')}, {byte('Z')}, {byte('0')},
-		{'a'}, {'z'}, {'A'}, {'Z'}, {'0'},
 	} {
-		t.Log(isLetter(a.a))
+		t.Log(isLetter(a.c))
 	}
 }
 
 func Test_isLower(t *testing.T) {
 	type args struct {
-		a interface{}
+		c byte
 	}
 	for _, a := range []*args{
 		{byte('a')}, {byte('z')}, {byte('A')}, {byte('Z')}, {byte('0')},
-		{'a'}, {'z'}, {'A'}, {'Z'}, {'0'},
 	} {
-		t.Log(isLower(a.a))
+		t.Log(isLower(a.c))
 	}
 }
 
 func Test_isUpper(t *testing.T) {
 	type args struct {
-		a interface{}
+		c byte
 	}
 	for _, a := range []*args{
 		{byte('a')}, {byte('z')}, {byte('A')}, {byte('Z')}, {byte('0')},
-		{'a'}, {'z'}, {'A'}, {'Z'}, {'0'},
 	} {
-		t.Log(isUpper(a.a))
+		t.Log(isUpper(a.c))
 	}
 }
 
 func Test_toLower(t *testing.T) {
 	for _, c := range "azAZ." {
-		t.Logf("%c %c", toLower(c), toLower(byte(c)))
+		t.Logf("%c", toLower(byte(c)))
 	}
 }
 
 func Test_toUpper(t *testing.T) {
 	for _, c := range "azAZ." {
-		t.Logf("%c %c", toUpper(c), toUpper(byte(c)))
+		t.Logf("%c", toUpper(byte(c)))
 	}
 }
 

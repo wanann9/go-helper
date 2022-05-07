@@ -19,10 +19,7 @@ import (
 var prt, prf = fmt.Println, fmt.Printf
 
 var s2i = func(s string, base int) int {
-	rst, err := strconv.ParseInt(s, base, 64)
-	if err != nil {
-		_, _ = prt(err)
-	}
+	rst, _ := strconv.ParseInt(s, base, 64)
 	return int(rst)
 }
 
@@ -37,75 +34,34 @@ var b2i = func(b bool) int {
 	return 0
 }
 
-var isNumber = func(a interface{}) bool {
-	switch aa := a.(type) {
-	case byte:
-		return aa >= '0' && aa <= '9'
-	case rune:
-		return aa >= '0' && aa <= '9'
-	default:
-		panic("isNumber")
-	}
+var isNumber = func(c byte) bool {
+	return c >= '0' && c <= '9'
 }
 
-var isLetter = func(a interface{}) bool {
-	return isLower(a) || isUpper(a)
+var isLetter = func(c byte) bool {
+	return isLower(c) || isUpper(c)
 }
 
-var isLower = func(a interface{}) bool {
-	switch aa := a.(type) {
-	case byte:
-		return aa >= 'a' && aa <= 'z'
-	case rune:
-		return aa >= 'a' && aa <= 'z'
-	default:
-		panic("isLower")
-	}
+var isLower = func(c byte) bool {
+	return c >= 'a' && c <= 'z'
 }
 
-var isUpper = func(a interface{}) bool {
-	switch aa := a.(type) {
-	case byte:
-		return aa >= 'A' && aa <= 'Z'
-	case rune:
-		return aa >= 'A' && aa <= 'Z'
-	default:
-		panic("isUpper")
-	}
+var isUpper = func(c byte) bool {
+	return c >= 'A' && c <= 'Z'
 }
 
-var toLower = func(a interface{}) byte {
-	switch aa := a.(type) {
-	case byte:
-		if isUpper(aa) {
-			aa ^= 32
-		}
-		return aa
-	case rune:
-		if isUpper(aa) {
-			aa ^= 32
-		}
-		return byte(aa)
-	default:
-		panic("toLower")
+var toLower = func(c byte) byte {
+	if isUpper(c) {
+		return c ^ 32
 	}
+	return c
 }
 
-var toUpper = func(a interface{}) byte {
-	switch aa := a.(type) {
-	case byte:
-		if isLower(aa) {
-			aa ^= 32
-		}
-		return aa
-	case rune:
-		if isLower(aa) {
-			aa ^= 32
-		}
-		return byte(aa)
-	default:
-		panic("toUpper")
+var toUpper = func(c byte) byte {
+	if isLower(c) {
+		return c ^ 32
 	}
+	return c
 }
 
 var abs = func(a int) int {
