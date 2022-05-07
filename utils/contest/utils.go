@@ -692,7 +692,7 @@ type multiSet struct {
 	cnt *treeMap
 }
 
-type _item struct {
+type mtsItem struct {
 	val interface{}
 	idx int
 }
@@ -700,7 +700,7 @@ type _item struct {
 var mts = func(comparator utils.Comparator) *multiSet {
 	return &multiSet{
 		treeSet: ts(func(a, b interface{}) int {
-			aa, bb := a.(_item), b.(_item)
+			aa, bb := a.(mtsItem), b.(mtsItem)
 			if rst := comparator(aa.val, bb.val); rst != 0 {
 				return rst
 			}
@@ -714,17 +714,17 @@ func (s *multiSet) Put(items ...interface{}) {
 	for _, item := range items {
 		//if node := s.cnt.GetNode(item); node != nil {
 		//	cnt := node.Value.(int)
-		//	s.treeSet.Put(_item{item, cnt})
+		//	s.treeSet.Put(mtsItem{item, cnt})
 		//	node.Value = cnt + 1
 		//} else {
-		//	s.treeSet.Put(_item{item, 0})
+		//	s.treeSet.Put(mtsItem{item, 0})
 		//	s.cnt.Put(item, 1)
 		//}
 		cnt := 0
 		if val, found := s.cnt.Get(item); found {
 			cnt = val.(int)
 		}
-		s.treeSet.Put(_item{item, cnt})
+		s.treeSet.Put(mtsItem{item, cnt})
 		s.cnt.Put(item, cnt+1)
 	}
 }
@@ -738,7 +738,7 @@ func (s *multiSet) Remove(items ...interface{}) {
 		//	} else {
 		//		node.Value = cnt
 		//	}
-		//	s.treeSet.Remove(_item{item, cnt})
+		//	s.treeSet.Remove(mtsItem{item, cnt})
 		//}
 		if val, found := s.cnt.Get(item); found {
 			cnt := val.(int)
@@ -747,7 +747,7 @@ func (s *multiSet) Remove(items ...interface{}) {
 			} else {
 				s.cnt.Put(item, cnt)
 			}
-			s.treeSet.Remove(_item{item, cnt})
+			s.treeSet.Remove(mtsItem{item, cnt})
 		}
 	}
 }
@@ -758,7 +758,7 @@ func (s *multiSet) removeAll(items ...interface{}) {
 			s.cnt.Remove(item)
 			cnt := val.(int)
 			for cnt--; cnt >= 0; cnt-- {
-				s.treeSet.Remove(_item{item, cnt})
+				s.treeSet.Remove(mtsItem{item, cnt})
 			}
 		}
 	}
@@ -790,29 +790,29 @@ func (s *multiSet) Clear() {
 func (s *multiSet) Values() []interface{} {
 	rst := make([]interface{}, s.Size())
 	for i, item := range s.treeSet.Values() {
-		rst[i] = item.(_item).val
+		rst[i] = item.(mtsItem).val
 	}
 	return rst
 }
 
 func (s *multiSet) min() interface{} {
-	return s.treeSet.min().(_item).val
+	return s.treeSet.min().(mtsItem).val
 }
 
 func (s *multiSet) max() interface{} {
-	return s.treeSet.max().(_item).val
+	return s.treeSet.max().(mtsItem).val
 }
 
 func (s *multiSet) floor(x interface{}) interface{} {
-	if item := s.treeSet.floor(_item{x, 0}); item != nil {
-		return item.(_item).val
+	if item := s.treeSet.floor(mtsItem{x, 0}); item != nil {
+		return item.(mtsItem).val
 	}
 	return nil
 }
 
 func (s *multiSet) ceiling(x interface{}) interface{} {
-	if item := s.treeSet.ceiling(_item{x, 0}); item != nil {
-		return item.(_item).val
+	if item := s.treeSet.ceiling(mtsItem{x, 0}); item != nil {
+		return item.(mtsItem).val
 	}
 	return nil
 }
