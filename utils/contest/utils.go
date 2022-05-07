@@ -243,158 +243,22 @@ var elm = func(a []int, i int) int {
 	return a[(i+len(a))%len(a)]
 }
 
-var rvs = func(a interface{}) {
-	switch aa := a.(type) {
-	case vector:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case text:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []int:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []int64:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []uint:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []uint64:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []byte:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []rune:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []float64:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []bool:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []string:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []pair:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []triplet:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []vector:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []text:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	case []interface{}:
-		for i, j := 0, len(aa)-1; i < j; i, j = i+1, j-1 {
-			aa[i], aa[j] = aa[j], aa[i]
-		}
-	default:
-		panic("rvs")
+var rvs = func(a []int) {
+	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
 	}
 }
 
-// string, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-var cpRvs = func(a interface{}) interface{} {
-	if aa, ok := a.(string); ok {
-		t := text(aa)
-		rvs(t)
-		return string(t)
-	}
+var cpRvs = func(a []int) []int {
 	rst := cp(a)
 	rvs(rst)
 	return rst
 }
 
-// int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-func cp(a interface{}) (rst interface{}) {
-	switch aa := a.(type) {
-	case int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet:
-		rst = a
-	case vector:
-		rst = make(vector, len(aa))
-		copy(rst.(vector), aa)
-	case text:
-		rst = make(text, len(aa))
-		copy(rst.(text), aa)
-	case []int:
-		rst = make([]int, len(aa))
-		copy(rst.([]int), aa)
-	case []int64:
-		rst = make([]int64, len(aa))
-		copy(rst.([]int64), aa)
-	case []uint:
-		rst = make([]uint, len(aa))
-		copy(rst.([]uint), aa)
-	case []uint64:
-		rst = make([]uint64, len(aa))
-		copy(rst.([]uint64), aa)
-	case []byte:
-		rst = make([]byte, len(aa))
-		copy(rst.([]byte), aa)
-	case []rune:
-		rst = make([]rune, len(aa))
-		copy(rst.([]rune), aa)
-	case []float64:
-		rst = make([]float64, len(aa))
-		copy(rst.([]float64), aa)
-	case []bool:
-		rst = make([]bool, len(aa))
-		copy(rst.([]bool), aa)
-	case []string:
-		rst = make([]string, len(aa))
-		copy(rst.([]string), aa)
-	case []pair:
-		rst = make([]pair, len(aa))
-		copy(rst.([]pair), aa)
-	case []triplet:
-		rst = make([]triplet, len(aa))
-		copy(rst.([]triplet), aa)
-	case []vector:
-		rst = make([]vector, len(aa))
-		for i, item := range aa {
-			rst.([]vector)[i] = cp(item).(vector)
-		}
-	case []text:
-		rst = make([]text, len(aa))
-		for i, item := range aa {
-			rst.([]text)[i] = cp(item).(text)
-		}
-	case []interface{}:
-		rst = make([]interface{}, len(aa))
-		for i, item := range aa {
-			rst.([]interface{})[i] = cp(item)
-		}
-	default:
-		panic("cp")
-	}
-	return
+func cp(a []int) []int {
+	rst := make([]int, len(a))
+	copy(rst, a)
+	return rst
 }
 
 // int, int64, uint, uint64, byte, rune, float64, bool, string, pair, triplet, vector, text
@@ -584,72 +448,6 @@ var cmp2 = func(a, b interface{}) int {
 // []interface{}
 var eq = func(a, b interface{}) bool {
 	return cmp(a, b) == 0
-}
-
-// vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-var srt = func(a interface{}, comparator utils.Comparator, stable bool) {
-	if stable {
-		sort.SliceStable(a, _less(a, comparator))
-	} else {
-		sort.Slice(a, _less(a, comparator))
-	}
-}
-
-// string, vector, text
-//
-// []int, []int64, []uint, []uint64, []byte, []rune, []float64, []bool, []string, []pair, []triplet, []vector, []text,
-// []interface{}
-var cpSrt = func(a interface{}, comparator utils.Comparator, stable bool) interface{} {
-	if aa, ok := a.(string); ok {
-		t := text(aa)
-		srt(t, comparator, stable)
-		return string(t)
-	}
-	rst := cp(a)
-	srt(rst, comparator, stable)
-	return rst
-}
-
-func _less(a interface{}, comparator utils.Comparator) func(int, int) bool {
-	switch aa := a.(type) {
-	case vector:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case text:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []int:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []int64:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []uint:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []uint64:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []byte:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []rune:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []float64:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []bool:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []string:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []pair:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []triplet:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []vector:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []text:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	case []interface{}:
-		return func(i, j int) bool { return comparator(aa[i], aa[j]) < 0 }
-	default:
-		panic("_less")
-	}
 }
 
 // string, vector, text
@@ -1536,37 +1334,39 @@ func (q *deque) popBack() interface{} {
 }
 
 var (
-	_          = big.NewInt
-	_          = bits.Len
-	_          = bits.Reverse
-	_          = bits.OnesCount
-	_, _       = bits.LeadingZeros, bits.TrailingZeros
-	_          = strings.Map
-	_          = strings.Join
-	_          = strings.Count
-	_          = strings.Repeat
-	_          = strings.Replace
-	_          = strings.EqualFold
-	_, _       = strings.ToLower, strings.ToUpper
-	_, _       = strings.SplitN, strings.SplitAfterN
-	_, _       = strings.HasPrefix, strings.HasSuffix
-	_, _       = strings.Contains, strings.ContainsAny
-	_, _, _    = strings.Index, strings.IndexAny, strings.IndexFunc
-	_, _, _    = strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc
-	_, _, _, _ = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
-	_, _, _, _ = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
+	_             = big.NewInt
+	_             = bits.Len
+	_             = bits.Reverse
+	_             = bits.OnesCount
+	_, _          = bits.LeadingZeros, bits.TrailingZeros
+	_, _, _, _, _ = sort.Ints, sort.Float64s, sort.Strings, sort.Slice, sort.SliceStable
+	_, _, _       = sort.IntsAreSorted, sort.Float64sAreSorted, sort.StringsAreSorted
+	_             = strings.Map
+	_             = strings.Join
+	_             = strings.Count
+	_             = strings.Repeat
+	_             = strings.Replace
+	_             = strings.EqualFold
+	_, _          = strings.ToLower, strings.ToUpper
+	_, _          = strings.SplitN, strings.SplitAfterN
+	_, _          = strings.HasPrefix, strings.HasSuffix
+	_, _          = strings.Contains, strings.ContainsAny
+	_, _, _       = strings.Index, strings.IndexAny, strings.IndexFunc
+	_, _, _       = strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc
+	_, _, _, _    = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
+	_, _, _, _    = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _                               = prt, prf
-	_, _, _                            = s2i, i2s, b2i
-	_, _, _, _, _, _                   = isNumber, isLetter, isLower, isUpper, toLower, toUpper
-	_, _, _, _, _, _, _, _, _          = abs, min, max, pow, gcd, lcm, c, isPrime, factor
-	_, _, _, _, _, _                   = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cpRvs, cp, cmp, cmp2, eq, srt, cpSrt, unq
-	_, _, _, _, _, _, _, _, _, _       = et, lt, gt, lgt, tp, bs, fd, lb, ub, cnt
-	_, _, _, _, _, _, _, _, _          = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
-	_, _, _, _                         = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _                   = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
-	_, _, _, _, _, _                   = hp, tm, ts, mts, hs, dq
+	_, _                         = prt, prf
+	_, _, _                      = s2i, i2s, b2i
+	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
+	_, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, isPrime, factor
+	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
+	_, _, _, _, _, _, _, _, _, _ = sz, pop, elm, rvs, cpRvs, cp, cmp, cmp2, eq, unq
+	_, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, bs, fd, lb, ub, cnt
+	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
+	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
+	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashset.Set{}, deque{}
+	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7

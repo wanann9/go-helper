@@ -4,8 +4,6 @@ import (
 	"math"
 	"math/rand"
 	"testing"
-
-	"github.com/emirpasic/gods/utils"
 )
 
 func Test_s2i(t *testing.T) {
@@ -200,10 +198,10 @@ func Test_pop(t *testing.T) {
 
 func Test_cpRvs(t *testing.T) {
 	type args struct {
-		a interface{}
+		a []int
 	}
 	for _, a := range []*args{
-		{"abc"}, {text{'a', 'b', 'c'}},
+		{[]int{0, 1, 2}},
 	} {
 		t.Log(cpRvs(a.a))
 		t.Log(a.a)
@@ -212,32 +210,12 @@ func Test_cpRvs(t *testing.T) {
 
 func Test_cp(t *testing.T) {
 	type args struct {
-		a interface{}
+		a []int
 	}
 	for _, a := range []*args{
-		{vector{0, 1}}, {[]pair{{0, 1}, {2, 3}}},
+		{[]int{0, 1, 2}},
 	} {
 		t.Log(cp(a.a))
-	}
-}
-
-func Test_srt(t *testing.T) {
-	s := "acb"
-	srt(text(s), cmp, false)
-	t.Log(s)
-}
-
-func Test_cpSrt(t *testing.T) {
-	type args struct {
-		a          interface{}
-		comparator utils.Comparator
-		stable     bool
-	}
-	for _, a := range []*args{
-		{"acb", cmp2, false}, {text{'a', 'c', 'b'}, cmp2, false},
-	} {
-		t.Log(cpSrt(a.a, a.comparator, a.stable))
-		t.Log(a.a)
 	}
 }
 
