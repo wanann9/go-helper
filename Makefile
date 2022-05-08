@@ -1,4 +1,4 @@
-PKGS=$(shell go list ./... | findstr /v "local")
+PKGS=$(shell go list ./... | grep -v "local")
 
 test:
 	go test -race -cover -count=1 $(PKGS)
