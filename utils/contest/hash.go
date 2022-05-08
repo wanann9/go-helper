@@ -29,6 +29,9 @@ func hsh(n int, elm func(int) int, factors ...pair) *hash {
 }
 
 func (h *hash) equal(h2 *hash, l, r, l2, r2 int) bool {
+	if r-l != r2-l2 {
+		return false
+	}
 	for i := range h.f {
 		if h.calc(i, l, r) != h2.calc(i, l2, r2) {
 			return false

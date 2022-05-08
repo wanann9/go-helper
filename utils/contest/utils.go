@@ -94,11 +94,11 @@ func max(nums ...int) int {
 func pow(a, b, mod int) (rst int) {
 	for rst = 1; b > 0; b >>= 1 {
 		if b&1 != 0 {
-			if rst *= a; mod > 1 {
+			if rst *= a; mod > 0 {
 				rst %= mod
 			}
 		}
-		if a *= a; mod > 1 {
+		if a *= a; mod > 0 {
 			a %= mod
 		}
 	}
@@ -123,7 +123,7 @@ func initC(n, mod int) {
 	for i := 0; i <= n; i++ {
 		c[i][0] = 1
 		for j := 1; j <= i; j++ {
-			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 1 {
+			if c[i][j] = c[i-1][j-1] + c[i-1][j]; mod > 0 {
 				c[i][j] %= mod
 			}
 		}
@@ -367,7 +367,7 @@ func child(n int, parent []int) ([][]int, int) {
 		if p >= 0 {
 			rst[p] = append(rst[p], c)
 		} else {
-			c = root
+			root = c
 		}
 	}
 	return rst, root

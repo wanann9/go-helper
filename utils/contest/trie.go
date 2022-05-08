@@ -16,7 +16,7 @@ func trn(n int, parent *trieNode) *trieNode {
 type trie struct {
 	root *trieNode
 	n    int
-	idx  map[byte]int
+	idx  [256]int
 }
 
 const (
@@ -28,7 +28,7 @@ const (
 
 func tr(charSet string) *trie {
 	n := len(charSet)
-	idx := make(map[byte]int, n)
+	var idx [256]int
 	for i, c := range text(charSet) {
 		idx[c] = i
 	}
