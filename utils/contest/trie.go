@@ -6,7 +6,7 @@ type trieNode struct {
 	curCnt, subCnt int
 }
 
-var trn = func(n int, parent *trieNode) *trieNode {
+func trn(n int, parent *trieNode) *trieNode {
 	return &trieNode{
 		children: make([]*trieNode, n),
 		parent:   parent,
@@ -26,7 +26,7 @@ const (
 	ucLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-var tr = func(charSet string) *trie {
+func tr(charSet string) *trie {
 	n := len(charSet)
 	idx := make(map[byte]int, n)
 	for i, c := range text(charSet) {
@@ -87,7 +87,7 @@ type trieNode01 struct {
 	//min            int
 }
 
-var trn01 = func(parent *trieNode01) *trieNode01 {
+func trn01(parent *trieNode01) *trieNode01 {
 	return &trieNode01{
 		parent: parent,
 		//min:    math.MaxInt,
@@ -99,7 +99,7 @@ type trie01 struct {
 	bits int
 }
 
-var tr01 = func(bits int) *trie01 {
+func tr01(bits int) *trie01 {
 	return &trie01{
 		root: trn01(nil),
 		bits: bits,

@@ -7,7 +7,7 @@ type hash struct {
 
 var hashFactors = []pair{{137, 9999971}, {131, 9999973}, {127, 9999991}}
 
-var hsh = func(n int, elm func(int) int, factors ...pair) *hash {
+func hsh(n int, elm func(int) int, factors ...pair) *hash {
 	v := vct(n, 0)
 	for i := range v {
 		v[i] = elm(i)

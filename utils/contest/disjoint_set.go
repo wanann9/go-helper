@@ -5,7 +5,7 @@ type disjointSet struct {
 	n    int
 }
 
-var djs = func(n int) *disjointSet {
+func djs(n int) *disjointSet {
 	a := vct(n, 0)
 	for i := range a {
 		a[i] = i

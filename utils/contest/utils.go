@@ -18,60 +18,60 @@ import (
 
 var prt, prf = fmt.Println, fmt.Printf
 
-var s2i = func(s string, base int) int {
+func s2i(s string, base int) int {
 	rst, _ := strconv.ParseInt(s, base, 64)
 	return int(rst)
 }
 
-var i2s = func(i, base int) string {
+func i2s(i, base int) string {
 	return strconv.FormatInt(int64(i), base)
 }
 
-var b2i = func(b bool) int {
+func b2i(b bool) int {
 	if b {
 		return 1
 	}
 	return 0
 }
 
-var isNumber = func(c byte) bool {
+func isNumber(c byte) bool {
 	return c >= '0' && c <= '9'
 }
 
-var isLetter = func(c byte) bool {
+func isLetter(c byte) bool {
 	return isLower(c) || isUpper(c)
 }
 
-var isLower = func(c byte) bool {
+func isLower(c byte) bool {
 	return c >= 'a' && c <= 'z'
 }
 
-var isUpper = func(c byte) bool {
+func isUpper(c byte) bool {
 	return c >= 'A' && c <= 'Z'
 }
 
-var toLower = func(c byte) byte {
+func toLower(c byte) byte {
 	if isUpper(c) {
 		return c ^ 32
 	}
 	return c
 }
 
-var toUpper = func(c byte) byte {
+func toUpper(c byte) byte {
 	if isLower(c) {
 		return c ^ 32
 	}
 	return c
 }
 
-var abs = func(a int) int {
+func abs(a int) int {
 	if a >= 0 {
 		return a
 	}
 	return -a
 }
 
-var min = func(nums ...int) int {
+func min(nums ...int) int {
 	rst := math.MaxInt
 	for _, n := range nums {
 		if n < rst {
@@ -81,7 +81,7 @@ var min = func(nums ...int) int {
 	return rst
 }
 
-var max = func(nums ...int) int {
+func max(nums ...int) int {
 	rst := math.MinInt
 	for _, n := range nums {
 		if n > rst {
@@ -91,7 +91,7 @@ var max = func(nums ...int) int {
 	return rst
 }
 
-var pow = func(a, b, mod int) (rst int) {
+func pow(a, b, mod int) (rst int) {
 	for rst = 1; b > 0; b >>= 1 {
 		if b&1 != 0 {
 			if rst *= a; mod > 1 {
@@ -105,19 +105,20 @@ var pow = func(a, b, mod int) (rst int) {
 	return
 }
 
-var gcd = func(a, b int) int {
-	for ; a%b != 0; a, b = b, a%b {
+func gcd(a, b int) int {
+	if a%b == 0 {
+		return b
 	}
-	return b
+	return gcd(b, a%b)
 }
 
-var lcm = func(a, b int) int {
+func lcm(a, b int) int {
 	return a / gcd(a, b) * b
 }
 
 var c [][]int
 
-var initC = func(n, mod int) {
+func initC(n, mod int) {
 	c = mtx(n+1, n+1, 0)
 	for i := 0; i <= n; i++ {
 		c[i][0] = 1
@@ -129,7 +130,7 @@ var initC = func(n, mod int) {
 	}
 }
 
-var isPrime = func(n int) bool {
+func isPrime(n int) bool {
 	if n <= 1 {
 		return false
 	}
@@ -141,7 +142,7 @@ var isPrime = func(n int) bool {
 	return true
 }
 
-var factor = func(n int) map[int]int {
+func factor(n int) map[int]int {
 	rst := make(map[int]int)
 	for i := 2; i*i <= n; i++ {
 		for ; n%i == 0; n /= i {
@@ -154,7 +155,7 @@ var factor = func(n int) map[int]int {
 	return rst
 }
 
-var vct = func(l, init int) []int {
+func vct(l, init int) []int {
 	v := make([]int, l)
 	if init != 0 {
 		for i := range v {
@@ -164,7 +165,7 @@ var vct = func(l, init int) []int {
 	return v
 }
 
-var mtx = func(l1, l2, init int) [][]int {
+func mtx(l1, l2, init int) [][]int {
 	m := make([][]int, l1)
 	for i := range m {
 		m[i] = vct(l2, init)
@@ -172,7 +173,7 @@ var mtx = func(l1, l2, init int) [][]int {
 	return m
 }
 
-var cb = func(l1, l2, l3, init int) [][][]int {
+func cb(l1, l2, l3, init int) [][][]int {
 	c := make([][][]int, l1)
 	for i := range c {
 		c[i] = mtx(l2, l3, init)
@@ -180,7 +181,7 @@ var cb = func(l1, l2, l3, init int) [][][]int {
 	return c
 }
 
-var vctBool = func(l int, init bool) []bool {
+func vctBool(l int, init bool) []bool {
 	v := make([]bool, l)
 	if init {
 		for i := range v {
@@ -190,7 +191,7 @@ var vctBool = func(l int, init bool) []bool {
 	return v
 }
 
-var mtxBool = func(l1, l2 int, init bool) [][]bool {
+func mtxBool(l1, l2 int, init bool) [][]bool {
 	m := make([][]bool, l1)
 	for i := range m {
 		m[i] = vctBool(l2, init)
@@ -198,7 +199,7 @@ var mtxBool = func(l1, l2 int, init bool) [][]bool {
 	return m
 }
 
-var cbBool = func(l1, l2, l3 int, init bool) [][][]bool {
+func cbBool(l1, l2, l3 int, init bool) [][][]bool {
 	c := make([][][]bool, l1)
 	for i := range c {
 		c[i] = mtxBool(l2, l3, init)
@@ -206,7 +207,7 @@ var cbBool = func(l1, l2, l3 int, init bool) [][][]bool {
 	return c
 }
 
-var sz = func(a interface{}) (int, int) {
+func sz(a interface{}) (int, int) {
 	switch a := a.(type) {
 	case [][]int:
 		return len(a), len(a[0])
@@ -233,34 +234,34 @@ var sz = func(a interface{}) (int, int) {
 	}
 }
 
-var pop = func(a *[]int) (rst int) {
+func pop(a *[]int) (rst int) {
 	rst, *a = elm(*a, -1), (*a)[:len(*a)-1]
 	return
 }
 
-var elm = func(a []int, i int) int {
+func elm(a []int, i int) int {
 	return a[(i+len(a))%len(a)]
 }
 
-var rvs = func(a []int) {
+func rvs(a []int) {
 	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
 		a[i], a[j] = a[j], a[i]
 	}
 }
 
-var cpRvs = func(a []int) []int {
+func cpRvs(a []int) []int {
 	rst := cp(a)
 	rvs(rst)
 	return rst
 }
 
-var cp = func(a []int) []int {
+func cp(a []int) []int {
 	rst := vct(len(a), 0)
 	copy(rst, a)
 	return rst
 }
 
-var unq = func(a []int) []int {
+func unq(a []int) []int {
 	rst := make([]int, 0, len(a))
 	for i, n := range a {
 		if i == 0 || n != a[i-1] {
@@ -300,7 +301,7 @@ var (
 	}
 )
 
-var rvsCmp = func(cmp utils.Comparator) utils.Comparator {
+func rvsCmp(cmp utils.Comparator) utils.Comparator {
 	return func(a, b interface{}) int { return -cmp(a, b) }
 }
 
@@ -311,14 +312,14 @@ const (
 	lgt = lt | gt
 )
 
-var tp = func(a []int) (rst byte) {
+func tp(a []int) (rst byte) {
 	for i := 1; i < len(a); i++ {
 		rst |= tp2(a[i-1], a[i], cmpInt)
 	}
 	return
 }
 
-var tp2 = func(a, b interface{}, cmp utils.Comparator) byte {
+func tp2(a, b interface{}, cmp utils.Comparator) byte {
 	if rst := cmp(a, b); rst == 0 {
 		return et
 	} else if rst < 0 {
@@ -327,7 +328,7 @@ var tp2 = func(a, b interface{}, cmp utils.Comparator) byte {
 	return gt
 }
 
-var bs = func(a []int, b int, t byte) int {
+func bs(a []int, b int, t byte) int {
 	check := func(i int) bool { return tp2(a[i], b, cmpInt)&t&lgt == 0 }
 	if i := lb(-1, len(a), check); i >= 0 && i < len(a) && a[i] == b {
 		return i
@@ -335,7 +336,7 @@ var bs = func(a []int, b int, t byte) int {
 	return -1
 }
 
-var fd = func(l, r, i int, check func(int) bool) int {
+func fd(l, r, i int, check func(int) bool) int {
 	inc := 1
 	if i < 0 {
 		l, r, i, inc = r, l, -i, -1
@@ -348,7 +349,7 @@ var fd = func(l, r, i int, check func(int) bool) int {
 	return -1
 }
 
-var lb = func(l, r int, check func(int) bool) int {
+func lb(l, r int, check func(int) bool) int {
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			r = m
@@ -359,7 +360,7 @@ var lb = func(l, r int, check func(int) bool) int {
 	return r
 }
 
-var ub = func(l, r int, check func(int) bool) int {
+func ub(l, r int, check func(int) bool) int {
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
 			l = m
@@ -370,7 +371,7 @@ var ub = func(l, r int, check func(int) bool) int {
 	return l
 }
 
-var cnt = func(l, r int, check func(int) bool) (rst int) {
+func cnt(l, r int, check func(int) bool) (rst int) {
 	for i := l; i <= r; i++ {
 		rst += b2i(check(i))
 	}
@@ -382,7 +383,7 @@ var (
 	drt2 = []pair{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
 )
 
-var srd = func(m, n, i, j int, drt []pair) []pair {
+func srd(m, n, i, j int, drt []pair) []pair {
 	rst := make([]pair, 0, len(drt))
 	for _, d := range drt {
 		if x, y := i+d[0], j+d[1]; in(x, y, 0, 0, m-1, n-1) {
@@ -392,11 +393,11 @@ var srd = func(m, n, i, j int, drt []pair) []pair {
 	return rst
 }
 
-var in = func(i, j, x1, y1, x2, y2 int) bool {
+func in(i, j, x1, y1, x2, y2 int) bool {
 	return i >= x1 && i <= x2 && j >= y1 && j <= y2
 }
 
-var ug = func(n int, edges [][]int) ([][]pair, []int) {
+func ug(n int, edges [][]int) ([][]pair, []int) {
 	g, d := make([][]pair, n), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
@@ -411,7 +412,7 @@ var ug = func(n int, edges [][]int) ([][]pair, []int) {
 	return g, d
 }
 
-var dg = func(n int, edges [][]int) ([][]pair, [][]pair, []int, []int) {
+func dg(n int, edges [][]int) ([][]pair, [][]pair, []int, []int) {
 	g, rg, id, od := make([][]pair, n), make([][]pair, n), vct(n, 0), vct(n, 0)
 	for _, e := range edges {
 		cost := 1
@@ -426,7 +427,7 @@ var dg = func(n int, edges [][]int) ([][]pair, [][]pair, []int, []int) {
 	return g, rg, id, od
 }
 
-var child = func(n int, parent []int) [][]int {
+func child(n int, parent []int) [][]int {
 	rst := make([][]int, n)
 	for c, p := range parent {
 		if p >= 0 {
@@ -436,7 +437,7 @@ var child = func(n int, parent []int) [][]int {
 	return rst
 }
 
-var dijkstra = func(n int, g [][]pair, src int) []int {
+func dijkstra(n int, g [][]pair, src int) []int {
 	dist, visited, h := vct(n, -1), vctBool(n, false), hp(cmpPair)
 	dist[src] = 0
 	h.Push(pair{0, src})
@@ -456,7 +457,7 @@ var dijkstra = func(n int, g [][]pair, src int) []int {
 	return dist
 }
 
-var tpSort = func(n int, g [][]pair, id []int) []int {
+func tpSort(n int, g [][]pair, id []int) []int {
 	rst := make([]int, 0, n)
 	for p, d := range id {
 		if d == 0 {
@@ -560,7 +561,7 @@ type heap struct {
 	*binaryheap.Heap
 }
 
-var hp = func(cmp utils.Comparator) *heap {
+func hp(cmp utils.Comparator) *heap {
 	return &heap{binaryheap.NewWith(cmp)}
 }
 
@@ -586,7 +587,7 @@ const (
 	tmIterEnd
 )
 
-var tmIter = func(tree *redblacktree.Tree, node *redblacktree.Node, pos byte) *tmIterator {
+func tmIter(tree *redblacktree.Tree, node *redblacktree.Node, pos byte) *tmIterator {
 	return &tmIterator{
 		tree: tree,
 		node: node,
@@ -710,7 +711,7 @@ type treeMap struct {
 	*redblacktree.Tree
 }
 
-var tm = func(cmp utils.Comparator) *treeMap {
+func tm(cmp utils.Comparator) *treeMap {
 	return &treeMap{redblacktree.NewWith(cmp)}
 }
 
@@ -749,7 +750,7 @@ type treeSet struct {
 	*treeMap
 }
 
-var ts = func(cmp utils.Comparator) *treeSet {
+func ts(cmp utils.Comparator) *treeSet {
 	return &treeSet{tm(cmp)}
 }
 
@@ -850,7 +851,7 @@ type mtsItem struct {
 	idx int
 }
 
-var mts = func(cmp utils.Comparator) *multiSet {
+func mts(cmp utils.Comparator) *multiSet {
 	return &multiSet{
 		treeSet: ts(func(a, b interface{}) int {
 			aa, bb := a.(mtsItem), b.(mtsItem)
@@ -959,7 +960,7 @@ type hashSet struct {
 	*hashset.Set
 }
 
-var hs = func(a interface{}) *hashSet {
+func hs(a interface{}) *hashSet {
 	s := &hashSet{hashset.New()}
 	if a == nil {
 		return s
@@ -1060,7 +1061,7 @@ type deque struct {
 	*list.List
 }
 
-var dq = func() *deque {
+func dq() *deque {
 	return &deque{list.New()}
 }
 

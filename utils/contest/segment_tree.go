@@ -10,7 +10,7 @@ type smtNode struct {
 	f, v int
 }
 
-var smt = func(a []int) *segmentTree {
+func smt(a []int) *segmentTree {
 	n := len(a)
 	t := &segmentTree{
 		n:     n,
