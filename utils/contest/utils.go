@@ -207,70 +207,6 @@ func cbBool(l1, l2, l3 int, init bool) [][][]bool {
 	return c
 }
 
-func sz(a interface{}) (int, int) {
-	switch a := a.(type) {
-	case [][]int:
-		return len(a), len(a[0])
-	case [][]int64:
-		return len(a), len(a[0])
-	case [][]uint:
-		return len(a), len(a[0])
-	case [][]uint64:
-		return len(a), len(a[0])
-	case [][]byte:
-		return len(a), len(a[0])
-	case [][]rune:
-		return len(a), len(a[0])
-	case [][]float64:
-		return len(a), len(a[0])
-	case [][]bool:
-		return len(a), len(a[0])
-	case [][]string:
-		return len(a), len(a[0])
-	case []string:
-		return len(a), len(a[0])
-	default:
-		panic("sz")
-	}
-}
-
-func pop(a *[]int) (rst int) {
-	rst, *a = elm(*a, -1), (*a)[:len(*a)-1]
-	return
-}
-
-func elm(a []int, i int) int {
-	return a[(i+len(a))%len(a)]
-}
-
-func rvs(a []int) {
-	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
-		a[i], a[j] = a[j], a[i]
-	}
-}
-
-func cpRvs(a []int) []int {
-	rst := cp(a)
-	rvs(rst)
-	return rst
-}
-
-func cp(a []int) []int {
-	rst := vct(len(a), 0)
-	copy(rst, a)
-	return rst
-}
-
-func unq(a []int) []int {
-	rst := make([]int, 0, len(a))
-	for i, n := range a {
-		if i == 0 || n != a[i-1] {
-			rst = append(rst, n)
-		}
-	}
-	return rst
-}
-
 var (
 	cmpInt     = utils.IntComparator
 	cmpInt64   = utils.Int64Comparator
@@ -305,35 +241,31 @@ func rvsCmp(cmp utils.Comparator) utils.Comparator {
 	return func(a, b interface{}) int { return -cmp(a, b) }
 }
 
-const (
-	et byte = 1 << iota
-	lt
-	gt
-	lgt = lt | gt
-)
-
-func tp(a []int) (rst byte) {
-	for i := 1; i < len(a); i++ {
-		rst |= tp2(a[i-1], a[i], cmpInt)
+func sz(a interface{}) (int, int) {
+	switch a := a.(type) {
+	case [][]int:
+		return len(a), len(a[0])
+	case [][]int64:
+		return len(a), len(a[0])
+	case [][]uint:
+		return len(a), len(a[0])
+	case [][]uint64:
+		return len(a), len(a[0])
+	case [][]byte:
+		return len(a), len(a[0])
+	case [][]rune:
+		return len(a), len(a[0])
+	case [][]float64:
+		return len(a), len(a[0])
+	case [][]bool:
+		return len(a), len(a[0])
+	case [][]string:
+		return len(a), len(a[0])
+	case []string:
+		return len(a), len(a[0])
+	default:
+		panic("sz")
 	}
-	return
-}
-
-func tp2(a, b interface{}, cmp utils.Comparator) byte {
-	if rst := cmp(a, b); rst == 0 {
-		return et
-	} else if rst < 0 {
-		return lt
-	}
-	return gt
-}
-
-func bs(a []int, b int, t byte) int {
-	check := func(i int) bool { return tp2(a[i], b, cmpInt)&t&lgt == 0 }
-	if i := lb(-1, len(a), check); i >= 0 && i < len(a) && a[i] == b {
-		return i
-	}
-	return -1
 }
 
 func fd(l, r, i int, check func(int) bool) int {
@@ -371,9 +303,11 @@ func ub(l, r int, check func(int) bool) int {
 	return l
 }
 
-func cnt(l, r int, check func(int) bool) (rst int) {
-	for i := l; i <= r; i++ {
-		rst += b2i(check(i))
+func cnt(l, r, i int, check func(int) bool) (rst int) {
+	for j := l; j <= r; j++ {
+		if rst += b2i(check(j)); i > 0 && rst == i {
+			break
+		}
 	}
 	return
 }
@@ -427,14 +361,16 @@ func dg(n int, edges [][]int) ([][]pair, [][]pair, []int, []int) {
 	return g, rg, id, od
 }
 
-func child(n int, parent []int) [][]int {
-	rst := make([][]int, n)
+func child(n int, parent []int) ([][]int, int) {
+	rst, root := make([][]int, n), -1
 	for c, p := range parent {
 		if p >= 0 {
 			rst[p] = append(rst[p], c)
+		} else {
+			c = root
 		}
 	}
-	return rst
+	return rst, root
 }
 
 func dijkstra(n int, g [][]pair, src int) []int {
@@ -1100,19 +1036,18 @@ var (
 	_, _, _, _    = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _    = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
 
-	_, _                            = prt, prf
-	_, _, _                         = s2i, i2s, b2i
-	_, _, _, _, _, _                = isNumber, isLetter, isLower, isUpper, toLower, toUpper
-	_, _, _, _, _, _, _, _, _, _    = abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor
-	_, _, _, _, _, _                = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _, _             = sz, pop, elm, rvs, cpRvs, cp, unq
-	_, _, _, _, _, _                = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
-	_, _, _, _, _, _                = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
-	_, _, _, _, _, _, _, _, _, _, _ = et, lt, gt, lgt, tp, tp2, bs, fd, lb, ub, cnt
-	_, _, _, _, _, _, _, _, _       = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
-	_, _, _, _                      = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _, _             = heap{}, tmIterator{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
-	_, _, _, _, _, _, _, _, _, _    = hp, tmIterBegin, tmIterBetween, tmIterEnd, tmIter, tm, ts, mts, hs, dq
+	_, _                         = prt, prf
+	_, _, _                      = s2i, i2s, b2i
+	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
+	_, _, _, _, _, _, _, _, _, _ = abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor
+	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
+	_, _, _, _, _, _             = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
+	_, _, _, _, _, _             = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
+	_, _, _, _, _                = sz, fd, lb, ub, cnt
+	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
+	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
+	_, _, _, _, _, _, _          = heap{}, tmIterator{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
+	_, _, _, _, _, _, _, _, _, _ = hp, tmIterBegin, tmIterBetween, tmIterEnd, tmIter, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7
