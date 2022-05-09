@@ -726,8 +726,8 @@ func (s *treeSet) Values() []interface{} {
 
 func (s *treeSet) intersection(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.iterator(); it.next(); {
-		if item := it.key(); another.contains(item) {
+	for it := s.Iterator(); it.Next(); {
+		if item := it.Key(); another.contains(item) {
 			rst.Put(item)
 		}
 	}
@@ -736,19 +736,19 @@ func (s *treeSet) intersection(another *treeSet) *treeSet {
 
 func (s *treeSet) union(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.iterator(); it.next(); {
-		rst.Put(it.key())
+	for it := s.Iterator(); it.Next(); {
+		rst.Put(it.Key())
 	}
-	for it := another.iterator(); it.next(); {
-		rst.Put(it.key())
+	for it := another.Iterator(); it.Next(); {
+		rst.Put(it.Key())
 	}
 	return rst
 }
 
 func (s *treeSet) difference(another *treeSet) *treeSet {
 	rst := ts(s.Comparator)
-	for it := s.iterator(); it.next(); {
-		if item := it.key(); !another.contains(item) {
+	for it := s.Iterator(); it.Next(); {
+		if item := it.Key(); !another.contains(item) {
 			rst.Put(item)
 		}
 	}
