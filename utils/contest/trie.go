@@ -108,7 +108,7 @@ func tr01(bits int) *trie01 {
 
 func (t *trie01) parse(n int) []int {
 	rst := vct(t.bits, 0)
-	for i := t.bits - 1; n > 0; n, i = n>>1, i-1 {
+	for i := t.bits - 1; i >= 0; n, i = n>>1, i-1 {
 		rst[i] = n & 1
 	}
 	return rst
@@ -176,7 +176,7 @@ func (t *trie01) query(n int) (p *trieNode01, a int) {
 //	for _, i := range t.parse(n) {
 //		j := i ^ 1
 //		if q := p.children[j]; q == nil || q.min > m {
-//			if j = i; p.children[j].min > m {
+//			if j, q = i, p.children[i]; q == nil || q.min > m {
 //				return nil, 0
 //			}
 //		}
