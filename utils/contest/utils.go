@@ -417,6 +417,28 @@ type (
 
 type vector []int
 
+func (v vector) copy() vector {
+	rst := make(vector, len(v))
+	copy(rst, v)
+	return rst
+}
+
+func (v vector) reverse() vector {
+	for i, j := 0, len(v)-1; i < j; i, j = i+1, j-1 {
+		v[i], v[j] = v[j], v[i]
+	}
+	return v
+}
+
+func (v vector) sort(cmp utils.Comparator, stable bool) vector {
+	if stable {
+		sort.SliceStable(v, func(i, j int) bool { return cmp(v[i], v[j]) < 0 })
+	} else {
+		sort.Slice(v, func(i, j int) bool { return cmp(v[i], v[j]) < 0 })
+	}
+	return v
+}
+
 func (v vector) sum() (rst int) {
 	for _, n := range v {
 		rst += n
@@ -467,6 +489,28 @@ func (v vector) counts() map[int]int {
 }
 
 type text []byte
+
+func (t text) copy() text {
+	rst := make(text, len(t))
+	copy(rst, t)
+	return rst
+}
+
+func (t text) reverse() text {
+	for i, j := 0, len(t)-1; i < j; i, j = i+1, j-1 {
+		t[i], t[j] = t[j], t[i]
+	}
+	return t
+}
+
+func (t text) sort(cmp utils.Comparator, stable bool) text {
+	if stable {
+		sort.SliceStable(t, func(i, j int) bool { return cmp(t[i], t[j]) < 0 })
+	} else {
+		sort.Slice(t, func(i, j int) bool { return cmp(t[i], t[j]) < 0 })
+	}
+	return t
+}
 
 func (t text) split(charSet string) (rst []string) {
 	var m [256]bool
