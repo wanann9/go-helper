@@ -12,7 +12,6 @@ import (
 
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/emirpasic/gods/trees/binaryheap"
-	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/emirpasic/gods/utils"
 )
 
@@ -555,174 +554,595 @@ func (h *heap) Peek() interface{} {
 	return rst
 }
 
-type tmIterator struct {
-	tree *redblacktree.Tree
-	node *redblacktree.Node
-	pos  byte
+const rbtNodeRed, rbtNodeBlack = false, true
+
+type rbtNode struct {
+	color               bool
+	Key, Value          interface{}
+	Left, Right, Parent *rbtNode
 }
 
-const (
-	tmIterBegin byte = iota
-	tmIterBetween
-	tmIterEnd
-)
-
-func tmIter(tree *redblacktree.Tree, node *redblacktree.Node, pos byte) *tmIterator {
-	return &tmIterator{
-		tree: tree,
-		node: node,
-		pos:  pos,
+func (node *rbtNode) grandparent() *rbtNode {
+	if node != nil && node.Parent != nil {
+		return node.Parent.Parent
 	}
+	return nil
 }
 
-func (it *tmIterator) next() bool {
-	if it.pos == tmIterEnd {
+func (node *rbtNode) uncle() *rbtNode {
+	if node == nil || node.Parent == nil || node.Parent.Parent == nil {
+		return nil
+	}
+	return node.Parent.sibling()
+}
+
+func (node *rbtNode) sibling() *rbtNode {
+	if node == nil || node.Parent == nil {
+		return nil
+	}
+	if node == node.Parent.Left {
+		return node.Parent.Right
+	}
+	return node.Parent.Left
+}
+
+func (node *rbtNode) maximumNode() *rbtNode {
+	if node == nil {
+		return nil
+	}
+	p := node
+	for p.Right != nil {
+		p = p.Right
+	}
+	return p
+}
+
+func (node *rbtNode) Size() int {
+	if node == nil {
+		return 0
+	}
+	size := 1
+	if node.Left != nil {
+		size += node.Left.Size()
+	}
+	if node.Right != nil {
+		size += node.Right.Size()
+	}
+	return size
+}
+
+const rbtIterBegin, rbtIterBetween, rbtIterEnd byte = 0, 1, 2
+
+type rbtIter struct {
+	tree     *rbTree
+	node     *rbtNode
+	position byte
+}
+
+func (iterator *rbtIter) Next() bool {
+	if iterator.position == rbtIterEnd {
 		goto end
 	}
-	if it.pos == tmIterBegin {
-		left := it.tree.Left()
+	if iterator.position == rbtIterBegin {
+		left := iterator.tree.Left()
 		if left == nil {
 			goto end
 		}
-		it.node = left
+		iterator.node = left
 		goto between
 	}
-	if it.node.Right != nil {
-		it.node = it.node.Right
-		for it.node.Left != nil {
-			it.node = it.node.Left
+	if iterator.node.Right != nil {
+		iterator.node = iterator.node.Right
+		for iterator.node.Left != nil {
+			iterator.node = iterator.node.Left
 		}
 		goto between
 	}
-	for it.node.Parent != nil {
-		node := it.node
-		it.node = it.node.Parent
-		if node == it.node.Left {
+	for iterator.node.Parent != nil {
+		node := iterator.node
+		iterator.node = iterator.node.Parent
+		if node == iterator.node.Left {
 			goto between
 		}
 	}
+
 end:
-	it.end()
+	iterator.node = nil
+	iterator.position = rbtIterEnd
 	return false
+
 between:
-	it.pos = tmIterBetween
+	iterator.position = rbtIterBetween
 	return true
 }
 
-func (it *tmIterator) prev() bool {
-	if it.pos == tmIterBegin {
+func (iterator *rbtIter) Prev() bool {
+	if iterator.position == rbtIterBegin {
 		goto begin
 	}
-	if it.pos == tmIterEnd {
-		right := it.tree.Right()
+	if iterator.position == rbtIterEnd {
+		right := iterator.tree.Right()
 		if right == nil {
 			goto begin
 		}
-		it.node = right
+		iterator.node = right
 		goto between
 	}
-	if it.node.Left != nil {
-		it.node = it.node.Left
-		for it.node.Right != nil {
-			it.node = it.node.Right
+	if iterator.node.Left != nil {
+		iterator.node = iterator.node.Left
+		for iterator.node.Right != nil {
+			iterator.node = iterator.node.Right
 		}
 		goto between
 	}
-	for it.node.Parent != nil {
-		node := it.node
-		it.node = it.node.Parent
-		if node == it.node.Right {
+	for iterator.node.Parent != nil {
+		node := iterator.node
+		iterator.node = iterator.node.Parent
+		if node == iterator.node.Right {
 			goto between
 		}
 	}
+
 begin:
-	it.begin()
+	iterator.node = nil
+	iterator.position = rbtIterBegin
 	return false
+
 between:
-	it.pos = tmIterBetween
+	iterator.position = rbtIterBetween
 	return true
 }
 
-func (it *tmIterator) key() interface{} {
-	return it.node.Key
+func (iterator *rbtIter) Value() interface{} {
+	return iterator.node.Value
 }
 
-func (it *tmIterator) value() interface{} {
-	return it.node.Value
+func (iterator *rbtIter) Key() interface{} {
+	return iterator.node.Key
 }
 
-func (it *tmIterator) begin() {
-	it.node, it.pos = nil, tmIterBegin
+func (iterator *rbtIter) Node() *rbtNode {
+	return iterator.node
 }
 
-func (it *tmIterator) end() {
-	it.node, it.pos = nil, tmIterEnd
+func (iterator *rbtIter) Begin() {
+	iterator.node = nil
+	iterator.position = rbtIterBegin
 }
 
-func (it *tmIterator) first() bool {
-	it.begin()
-	return it.next()
+func (iterator *rbtIter) End() {
+	iterator.node = nil
+	iterator.position = rbtIterEnd
 }
 
-func (it *tmIterator) last() bool {
-	it.end()
-	return it.prev()
+func (iterator *rbtIter) First() bool {
+	iterator.Begin()
+	return iterator.Next()
 }
 
-func (it *tmIterator) nextTo(f func(key interface{}, value interface{}) bool) bool {
-	for it.next() {
-		if f(it.key(), it.value()) {
+func (iterator *rbtIter) Last() bool {
+	iterator.End()
+	return iterator.Prev()
+}
+
+func (iterator *rbtIter) NextTo(f func(key interface{}, value interface{}) bool) bool {
+	for iterator.Next() {
+		key, value := iterator.Key(), iterator.Value()
+		if f(key, value) {
 			return true
 		}
 	}
 	return false
 }
 
-func (it *tmIterator) prevTo(f func(key interface{}, value interface{}) bool) bool {
-	for it.prev() {
-		if f(it.key(), it.value()) {
+func (iterator *rbtIter) PrevTo(f func(key interface{}, value interface{}) bool) bool {
+	for iterator.Prev() {
+		key, value := iterator.Key(), iterator.Value()
+		if f(key, value) {
 			return true
 		}
 	}
 	return false
 }
 
-type treeMap struct {
-	*redblacktree.Tree
+type rbTree struct {
+	size       int
+	Root       *rbtNode
+	Comparator utils.Comparator
 }
 
-func tm(cmp utils.Comparator) *treeMap {
-	return &treeMap{redblacktree.NewWith(cmp)}
+func (tree *rbTree) Put(key interface{}, value interface{}) {
+	var insertedNode *rbtNode
+	if tree.Root == nil {
+		// Assert key is of comparator's type for initial tree
+		tree.Comparator(key, key)
+		tree.Root = &rbtNode{Key: key, Value: value, color: rbtNodeRed}
+		insertedNode = tree.Root
+	} else {
+		node := tree.Root
+		loop := true
+		for loop {
+			compare := tree.Comparator(key, node.Key)
+			switch {
+			case compare == 0:
+				node.Key = key
+				node.Value = value
+				return
+			case compare < 0:
+				if node.Left == nil {
+					node.Left = &rbtNode{Key: key, Value: value, color: rbtNodeRed}
+					insertedNode = node.Left
+					loop = false
+				} else {
+					node = node.Left
+				}
+			case compare > 0:
+				if node.Right == nil {
+					node.Right = &rbtNode{Key: key, Value: value, color: rbtNodeRed}
+					insertedNode = node.Right
+					loop = false
+				} else {
+					node = node.Right
+				}
+			}
+		}
+		insertedNode.Parent = node
+	}
+	tree.insertCase1(insertedNode)
+	tree.size++
 }
 
-func (m *treeMap) getNode(key interface{}) *redblacktree.Node {
-	for p := m.Root; p != nil; {
-		if rst := m.Comparator(key, p.Key); rst == 0 {
-			return p
-		} else if rst < 0 {
-			p = p.Left
+func (tree *rbTree) Get(key interface{}) (value interface{}, found bool) {
+	node := tree.lookup(key)
+	if node != nil {
+		return node.Value, true
+	}
+	return nil, false
+}
+
+func (tree *rbTree) GetNode(key interface{}) *rbtNode {
+	return tree.lookup(key)
+}
+
+func (tree *rbTree) Remove(key interface{}) {
+	tree.RemoveNode(tree.lookup(key))
+}
+
+func (tree *rbTree) RemoveNode(node *rbtNode) {
+	var child *rbtNode
+	if node == nil {
+		return
+	}
+	if node.Left != nil && node.Right != nil {
+		pred := node.Left.maximumNode()
+		node.Key = pred.Key
+		node.Value = pred.Value
+		node = pred
+	}
+	if node.Left == nil || node.Right == nil {
+		if node.Right == nil {
+			child = node.Left
 		} else {
-			p = p.Right
+			child = node.Right
+		}
+		if node.color == rbtNodeBlack {
+			node.color = tree.nodeColor(child)
+			tree.deleteCase1(node)
+		}
+		tree.replaceNode(node, child)
+		if node.Parent == nil && child != nil {
+			child.color = rbtNodeBlack
+		}
+	}
+	tree.size--
+}
+
+func (tree *rbTree) Empty() bool {
+	return tree.size == 0
+}
+
+func (tree *rbTree) Size() int {
+	return tree.size
+}
+
+func (tree *rbTree) Clear() {
+	tree.Root = nil
+	tree.size = 0
+}
+
+func (tree *rbTree) Keys() []interface{} {
+	keys := make([]interface{}, tree.size)
+	it := tree.Iterator()
+	for i := 0; it.Next(); i++ {
+		keys[i] = it.Key()
+	}
+	return keys
+}
+
+func (tree *rbTree) Values() []interface{} {
+	values := make([]interface{}, tree.size)
+	it := tree.Iterator()
+	for i := 0; it.Next(); i++ {
+		values[i] = it.Value()
+	}
+	return values
+}
+
+func (tree *rbTree) Left() *rbtNode {
+	var parent *rbtNode
+	current := tree.Root
+	for current != nil {
+		parent = current
+		current = current.Left
+	}
+	return parent
+}
+
+func (tree *rbTree) Right() *rbtNode {
+	var parent *rbtNode
+	current := tree.Root
+	for current != nil {
+		parent = current
+		current = current.Right
+	}
+	return parent
+}
+
+func (tree *rbTree) Floor(key interface{}) (floor *rbtNode, found bool) {
+	found = false
+	node := tree.Root
+	for node != nil {
+		compare := tree.Comparator(key, node.Key)
+		switch {
+		case compare == 0:
+			return node, true
+		case compare < 0:
+			node = node.Left
+		case compare > 0:
+			floor, found = node, true
+			node = node.Right
+		}
+	}
+	if found {
+		return floor, true
+	}
+	return nil, false
+}
+
+func (tree *rbTree) Ceiling(key interface{}) (ceiling *rbtNode, found bool) {
+	found = false
+	node := tree.Root
+	for node != nil {
+		compare := tree.Comparator(key, node.Key)
+		switch {
+		case compare == 0:
+			return node, true
+		case compare < 0:
+			ceiling, found = node, true
+			node = node.Left
+		case compare > 0:
+			node = node.Right
+		}
+	}
+	if found {
+		return ceiling, true
+	}
+	return nil, false
+}
+
+func (tree *rbTree) Iterator() *rbtIter {
+	return &rbtIter{tree: tree, node: nil, position: rbtIterBegin}
+}
+
+func (tree *rbTree) IteratorAt(node *rbtNode) *rbtIter {
+	return &rbtIter{tree: tree, node: node, position: rbtIterBetween}
+}
+
+func (tree *rbTree) lookup(key interface{}) *rbtNode {
+	node := tree.Root
+	for node != nil {
+		compare := tree.Comparator(key, node.Key)
+		switch {
+		case compare == 0:
+			return node
+		case compare < 0:
+			node = node.Left
+		case compare > 0:
+			node = node.Right
 		}
 	}
 	return nil
 }
 
-func (m *treeMap) iterator() *tmIterator {
-	return tmIter(m.Tree, nil, tmIterBegin)
+func (tree *rbTree) insertCase1(node *rbtNode) {
+	if node.Parent == nil {
+		node.color = rbtNodeBlack
+	} else {
+		tree.insertCase2(node)
+	}
 }
 
-func (m *treeMap) iteratorAt(node *redblacktree.Node) *tmIterator {
-	return tmIter(m.Tree, node, tmIterBetween)
+func (tree *rbTree) insertCase2(node *rbtNode) {
+	if tree.nodeColor(node.Parent) == rbtNodeBlack {
+		return
+	}
+	tree.insertCase3(node)
 }
 
-func (m *treeMap) Floor(x interface{}) *redblacktree.Node {
-	rst, _ := m.Tree.Floor(x)
+func (tree *rbTree) insertCase3(node *rbtNode) {
+	uncle := node.uncle()
+	if tree.nodeColor(uncle) == rbtNodeRed {
+		node.Parent.color = rbtNodeBlack
+		uncle.color = rbtNodeBlack
+		node.grandparent().color = rbtNodeRed
+		tree.insertCase1(node.grandparent())
+	} else {
+		tree.insertCase4(node)
+	}
+}
+
+func (tree *rbTree) insertCase4(node *rbtNode) {
+	grandparent := node.grandparent()
+	if node == node.Parent.Right && node.Parent == grandparent.Left {
+		tree.rotateLeft(node.Parent)
+		node = node.Left
+	} else if node == node.Parent.Left && node.Parent == grandparent.Right {
+		tree.rotateRight(node.Parent)
+		node = node.Right
+	}
+	tree.insertCase5(node)
+}
+
+func (tree *rbTree) insertCase5(node *rbtNode) {
+	node.Parent.color = rbtNodeBlack
+	grandparent := node.grandparent()
+	grandparent.color = rbtNodeRed
+	if node == node.Parent.Left && node.Parent == grandparent.Left {
+		tree.rotateRight(grandparent)
+	} else if node == node.Parent.Right && node.Parent == grandparent.Right {
+		tree.rotateLeft(grandparent)
+	}
+}
+
+func (tree *rbTree) deleteCase1(node *rbtNode) {
+	if node.Parent == nil {
+		return
+	}
+	tree.deleteCase2(node)
+}
+
+func (tree *rbTree) deleteCase2(node *rbtNode) {
+	sibling := node.sibling()
+	if tree.nodeColor(sibling) == rbtNodeRed {
+		node.Parent.color = rbtNodeRed
+		sibling.color = rbtNodeBlack
+		if node == node.Parent.Left {
+			tree.rotateLeft(node.Parent)
+		} else {
+			tree.rotateRight(node.Parent)
+		}
+	}
+	tree.deleteCase3(node)
+}
+
+func (tree *rbTree) deleteCase3(node *rbtNode) {
+	sibling := node.sibling()
+	if tree.nodeColor(node.Parent) == rbtNodeBlack &&
+		tree.nodeColor(sibling) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Left) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Right) == rbtNodeBlack {
+		sibling.color = rbtNodeRed
+		tree.deleteCase1(node.Parent)
+	} else {
+		tree.deleteCase4(node)
+	}
+}
+
+func (tree *rbTree) deleteCase4(node *rbtNode) {
+	sibling := node.sibling()
+	if tree.nodeColor(node.Parent) == rbtNodeRed &&
+		tree.nodeColor(sibling) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Left) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Right) == rbtNodeBlack {
+		sibling.color = rbtNodeRed
+		node.Parent.color = rbtNodeBlack
+	} else {
+		tree.deleteCase5(node)
+	}
+}
+
+func (tree *rbTree) deleteCase5(node *rbtNode) {
+	sibling := node.sibling()
+	if node == node.Parent.Left &&
+		tree.nodeColor(sibling) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Left) == rbtNodeRed &&
+		tree.nodeColor(sibling.Right) == rbtNodeBlack {
+		sibling.color = rbtNodeRed
+		sibling.Left.color = rbtNodeBlack
+		tree.rotateRight(sibling)
+	} else if node == node.Parent.Right &&
+		tree.nodeColor(sibling) == rbtNodeBlack &&
+		tree.nodeColor(sibling.Right) == rbtNodeRed &&
+		tree.nodeColor(sibling.Left) == rbtNodeBlack {
+		sibling.color = rbtNodeRed
+		sibling.Right.color = rbtNodeBlack
+		tree.rotateLeft(sibling)
+	}
+	tree.deleteCase6(node)
+}
+
+func (tree *rbTree) deleteCase6(node *rbtNode) {
+	sibling := node.sibling()
+	sibling.color = tree.nodeColor(node.Parent)
+	node.Parent.color = rbtNodeBlack
+	if node == node.Parent.Left && tree.nodeColor(sibling.Right) == rbtNodeRed {
+		sibling.Right.color = rbtNodeBlack
+		tree.rotateLeft(node.Parent)
+	} else if tree.nodeColor(sibling.Left) == rbtNodeRed {
+		sibling.Left.color = rbtNodeBlack
+		tree.rotateRight(node.Parent)
+	}
+}
+
+func (tree *rbTree) rotateLeft(node *rbtNode) {
+	right := node.Right
+	tree.replaceNode(node, right)
+	node.Right = right.Left
+	if right.Left != nil {
+		right.Left.Parent = node
+	}
+	right.Left = node
+	node.Parent = right
+}
+
+func (tree *rbTree) rotateRight(node *rbtNode) {
+	left := node.Left
+	tree.replaceNode(node, left)
+	node.Left = left.Right
+	if left.Right != nil {
+		left.Right.Parent = node
+	}
+	left.Right = node
+	node.Parent = left
+}
+
+func (tree *rbTree) replaceNode(old *rbtNode, new *rbtNode) {
+	if old.Parent == nil {
+		tree.Root = new
+	} else {
+		if old == old.Parent.Left {
+			old.Parent.Left = new
+		} else {
+			old.Parent.Right = new
+		}
+	}
+	if new != nil {
+		new.Parent = old.Parent
+	}
+}
+
+func (*rbTree) nodeColor(node *rbtNode) bool {
+	if node == nil {
+		return rbtNodeBlack
+	}
+	return node.color
+}
+
+type treeMap struct {
+	*rbTree
+}
+
+func tm(cmp utils.Comparator) *treeMap {
+	return &treeMap{&rbTree{Comparator: cmp}}
+}
+
+func (m *treeMap) Floor(x interface{}) *rbtNode {
+	rst, _ := m.rbTree.Floor(x)
 	return rst
 }
 
-func (m *treeMap) Ceiling(x interface{}) *redblacktree.Node {
-	rst, _ := m.Tree.Ceiling(x)
+func (m *treeMap) Ceiling(x interface{}) *rbtNode {
+	rst, _ := m.rbTree.Ceiling(x)
 	return rst
 }
 
@@ -736,13 +1156,13 @@ func ts(cmp utils.Comparator) *treeSet {
 
 func (s *treeSet) Put(items ...interface{}) {
 	for _, item := range items {
-		s.Tree.Put(item, struct{}{})
+		s.rbTree.Put(item, struct{}{})
 	}
 }
 
 func (s *treeSet) Remove(items ...interface{}) {
 	for _, item := range items {
-		s.Tree.Remove(item)
+		s.rbTree.Remove(item)
 	}
 }
 
@@ -846,7 +1266,7 @@ func mts(cmp utils.Comparator) *multiSet {
 
 func (s *multiSet) Put(items ...interface{}) {
 	for _, item := range items {
-		if node := s.cnt.getNode(item); node != nil {
+		if node := s.cnt.GetNode(item); node != nil {
 			cnt := node.Value.(int)
 			s.treeSet.Put(mtsItem{item, cnt})
 			node.Value = cnt + 1
@@ -859,7 +1279,7 @@ func (s *multiSet) Put(items ...interface{}) {
 
 func (s *multiSet) Remove(items ...interface{}) {
 	for _, item := range items {
-		if node := s.cnt.getNode(item); node != nil {
+		if node := s.cnt.GetNode(item); node != nil {
 			cnt := node.Value.(int)
 			if cnt--; cnt == 0 {
 				s.cnt.Remove(item)
@@ -1090,8 +1510,8 @@ var (
 	_, _, _, _, _                = sz, fd, lb, ub, cnt
 	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _, _          = heap{}, tmIterator{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
-	_, _, _, _, _, _, _, _, _, _ = hp, tmIterBegin, tmIterBetween, tmIterEnd, tmIter, tm, ts, mts, hs, dq
+	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
+	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
 )
 
 const mod int = 1e9 + 7

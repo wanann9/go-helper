@@ -218,12 +218,12 @@ func Test_treeMap(t *testing.T) {
 		m.Put(n, 10-n)
 	}
 	t.Log(m.Left(), m.Right())
-	it := m.iteratorAt(m.Left())
-	for it.prev(); it.next(); {
-		t.Log(it.key(), it.value())
+	it := m.IteratorAt(m.Left())
+	for it.Prev(); it.Next(); {
+		t.Log(it.Key(), it.Value())
 	}
-	for it.prev() {
-		t.Log(it.key(), it.value())
+	for it.Prev() {
+		t.Log(it.Key(), it.Value())
 	}
 }
 
