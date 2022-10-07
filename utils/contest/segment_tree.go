@@ -57,6 +57,9 @@ func (t *segmentTree) calc(x, y int) int {
 }
 
 func (t *segmentTree) calc2(i, l, r, x, y int) (rst int) {
+	if x > y {
+		return
+	}
 	if x <= l && y >= r {
 		return t.nodes[i].f + t.nodes[i].v*(r-l+1)
 	}
@@ -115,6 +118,9 @@ func (t *smtNode2) update(x, y, k int) {
 }
 
 func (t *smtNode2) calc(x, y int) (rst int) {
+	if x > y {
+		return
+	}
 	if x <= t.l && y >= t.r {
 		return t.f + t.v*(t.r-t.l+1)
 	}
