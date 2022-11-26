@@ -280,6 +280,24 @@ func fd(l, r, i int, check func(int) bool) int {
 	return -1
 }
 
+func all(l, r int, check func(int) bool) bool {
+	for i := l; i <= r; i++ {
+		if !check(i) {
+			return false
+		}
+	}
+	return true
+}
+
+func anyOne(l, r int, check func(int) bool) bool {
+	for i := l; i <= r; i++ {
+		if check(i) {
+			return true
+		}
+	}
+	return false
+}
+
 func lb(l, r int, check func(int) bool) int {
 	for l+1 < r {
 		if m := l + (r-l)>>1; check(m) {
@@ -1507,7 +1525,7 @@ var (
 	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
 	_, _, _, _, _, _             = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
 	_, _, _, _, _, _             = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
-	_, _, _, _, _                = sz, fd, lb, ub, cnt
+	_, _, _, _, _, _, _          = sz, fd, all, anyOne, lb, ub, cnt
 	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
 	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
