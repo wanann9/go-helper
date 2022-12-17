@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"container/list"
 	"fmt"
+	"index/suffixarray"
 	"math"
 	"math/big"
 	"math/bits"
@@ -327,6 +329,15 @@ func cnt(l, r, i int, check func(int) bool) (rst int) {
 		}
 	}
 	return
+}
+
+func idxSort(n int, less func(i, j int) bool) []int {
+	rst := vct(n, 0)
+	for i := range rst {
+		rst[i] = i
+	}
+	sort.Slice(rst, func(i, j int) bool { return less(rst[i], rst[j]) })
+	return rst
 }
 
 var (
@@ -1496,20 +1507,40 @@ func (q *deque) popBack() interface{} {
 }
 
 var (
-	_             = big.NewInt
+	_, _          = big.NewInt, big.Int{}
 	_             = bits.Len
 	_             = bits.Reverse
 	_             = bits.OnesCount
 	_, _          = bits.LeadingZeros, bits.TrailingZeros
+	_             = bytes.Map
+	_             = bytes.Cut
+	_             = bytes.Join
+	_             = bytes.Count
+	_             = bytes.Repeat
+	_             = bytes.Compare
+	_             = bytes.Replace
+	_             = bytes.EqualFold
+	_, _          = bytes.ToLower, bytes.ToUpper
+	_, _          = bytes.Fields, bytes.FieldsFunc
+	_, _          = bytes.SplitN, bytes.SplitAfterN
+	_, _          = bytes.HasPrefix, bytes.HasSuffix
+	_, _          = bytes.Contains, bytes.ContainsAny
+	_, _, _       = bytes.Index, bytes.IndexAny, bytes.IndexFunc
+	_, _, _       = bytes.LastIndex, bytes.LastIndexAny, bytes.LastIndexFunc
+	_, _, _, _    = bytes.Trim, bytes.TrimFunc, bytes.TrimPrefix, bytes.TrimSuffix
+	_, _, _, _    = bytes.TrimLeft, bytes.TrimLeftFunc, bytes.TrimRight, bytes.TrimRightFunc
 	_, _, _, _, _ = sort.Ints, sort.Float64s, sort.Strings, sort.Slice, sort.SliceStable
 	_, _, _       = sort.IntsAreSorted, sort.Float64sAreSorted, sort.StringsAreSorted
 	_             = strings.Map
+	_             = strings.Cut
 	_             = strings.Join
 	_             = strings.Count
 	_             = strings.Repeat
+	_             = strings.Compare
 	_             = strings.Replace
 	_             = strings.EqualFold
 	_, _          = strings.ToLower, strings.ToUpper
+	_, _          = strings.Fields, strings.FieldsFunc
 	_, _          = strings.SplitN, strings.SplitAfterN
 	_, _          = strings.HasPrefix, strings.HasSuffix
 	_, _          = strings.Contains, strings.ContainsAny
@@ -1517,6 +1548,7 @@ var (
 	_, _, _       = strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc
 	_, _, _, _    = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
 	_, _, _, _    = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
+	_, _          = suffixarray.New, suffixarray.Index{}
 
 	_, _                         = prt, prf
 	_, _, _                      = s2i, i2s, b2i
@@ -1525,7 +1557,7 @@ var (
 	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
 	_, _, _, _, _, _             = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
 	_, _, _, _, _, _             = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
-	_, _, _, _, _, _, _          = sz, fd, all, anyOne, lb, ub, cnt
+	_, _, _, _, _, _, _, _       = sz, fd, all, anyOne, lb, ub, cnt, idxSort
 	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
 	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
 	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
