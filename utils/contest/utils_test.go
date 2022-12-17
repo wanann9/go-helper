@@ -255,3 +255,8 @@ func Test_hashSet(t *testing.T) {
 	t.Log(s1.union(s2))
 	t.Log(s1.difference(s2))
 }
+
+func Test_idxSort(t *testing.T) {
+	a := []int{1, 3, 2, 4}
+	t.Log(idxSort(4, func(i, j int) bool { return a[i] < a[j] }))
+}
