@@ -1513,7 +1513,6 @@ var (
 	_             = bits.OnesCount
 	_, _          = bits.LeadingZeros, bits.TrailingZeros
 	_             = bytes.Map
-	_             = bytes.Cut
 	_             = bytes.Join
 	_             = bytes.Count
 	_             = bytes.Repeat
@@ -1532,7 +1531,6 @@ var (
 	_, _, _, _, _ = sort.Ints, sort.Float64s, sort.Strings, sort.Slice, sort.SliceStable
 	_, _, _       = sort.IntsAreSorted, sort.Float64sAreSorted, sort.StringsAreSorted
 	_             = strings.Map
-	_             = strings.Cut
 	_             = strings.Join
 	_             = strings.Count
 	_             = strings.Repeat
