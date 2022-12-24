@@ -1506,61 +1506,41 @@ func (q *deque) popBack() interface{} {
 	return q.Remove(q.Back())
 }
 
-var (
-	_, _          = big.NewInt, big.Int{}
-	_             = bits.Len
-	_             = bits.Reverse
-	_             = bits.OnesCount
-	_, _          = bits.LeadingZeros, bits.TrailingZeros
-	_             = bytes.Map
-	_             = bytes.Join
-	_             = bytes.Count
-	_             = bytes.Repeat
-	_             = bytes.Compare
-	_             = bytes.Replace
-	_             = bytes.EqualFold
-	_, _          = bytes.ToLower, bytes.ToUpper
-	_, _          = bytes.Fields, bytes.FieldsFunc
-	_, _          = bytes.SplitN, bytes.SplitAfterN
-	_, _          = bytes.HasPrefix, bytes.HasSuffix
-	_, _          = bytes.Contains, bytes.ContainsAny
-	_, _, _       = bytes.Index, bytes.IndexAny, bytes.IndexFunc
-	_, _, _       = bytes.LastIndex, bytes.LastIndexAny, bytes.LastIndexFunc
-	_, _, _, _    = bytes.Trim, bytes.TrimFunc, bytes.TrimPrefix, bytes.TrimSuffix
-	_, _, _, _    = bytes.TrimLeft, bytes.TrimLeftFunc, bytes.TrimRight, bytes.TrimRightFunc
-	_, _, _, _, _ = sort.Ints, sort.Float64s, sort.Strings, sort.Slice, sort.SliceStable
-	_, _, _       = sort.IntsAreSorted, sort.Float64sAreSorted, sort.StringsAreSorted
-	_             = strings.Map
-	_             = strings.Join
-	_             = strings.Count
-	_             = strings.Repeat
-	_             = strings.Compare
-	_             = strings.Replace
-	_             = strings.EqualFold
-	_, _          = strings.ToLower, strings.ToUpper
-	_, _          = strings.Fields, strings.FieldsFunc
-	_, _          = strings.SplitN, strings.SplitAfterN
-	_, _          = strings.HasPrefix, strings.HasSuffix
-	_, _          = strings.Contains, strings.ContainsAny
-	_, _, _       = strings.Index, strings.IndexAny, strings.IndexFunc
-	_, _, _       = strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc
-	_, _, _, _    = strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix
-	_, _, _, _    = strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc
-	_, _          = suffixarray.New, suffixarray.Index{}
+var _ = []interface{}{
+	big.NewInt, big.Int{},
 
-	_, _                         = prt, prf
-	_, _, _                      = s2i, i2s, b2i
-	_, _, _, _, _, _             = isNumber, isLetter, isLower, isUpper, toLower, toUpper
-	_, _, _, _, _, _, _, _, _, _ = abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor
-	_, _, _, _, _, _             = vct, mtx, cb, vctBool, mtxBool, cbBool
-	_, _, _, _, _, _             = cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune
-	_, _, _, _, _, _             = cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp
-	_, _, _, _, _, _, _, _       = sz, fd, all, anyOne, lb, ub, cnt, idxSort
-	_, _, _, _, _, _, _, _, _    = drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort
-	_, _, _, _                   = pair{}, triplet{}, vector{}, text{}
-	_, _, _, _, _, _             = heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{}
-	_, _, _, _, _, _             = hp, tm, ts, mts, hs, dq
-)
+	bits.Len, bits.Reverse, bits.OnesCount, bits.LeadingZeros, bits.TrailingZeros,
+
+	bytes.Map, bytes.Join, bytes.Count, bytes.Repeat, bytes.Compare, bytes.Replace, bytes.EqualFold,
+	bytes.ToLower, bytes.ToUpper, bytes.Fields, bytes.FieldsFunc, bytes.SplitN, bytes.SplitAfterN,
+	bytes.HasPrefix, bytes.HasSuffix, bytes.Contains, bytes.ContainsAny,
+	bytes.Index, bytes.IndexAny, bytes.IndexFunc, bytes.LastIndex, bytes.LastIndexAny, bytes.LastIndexFunc,
+	bytes.Trim, bytes.TrimFunc, bytes.TrimPrefix, bytes.TrimSuffix,
+	bytes.TrimLeft, bytes.TrimLeftFunc, bytes.TrimRight, bytes.TrimRightFunc,
+
+	sort.Ints, sort.Float64s, sort.Strings, sort.Slice, sort.SliceStable,
+	sort.IntsAreSorted, sort.Float64sAreSorted, sort.StringsAreSorted,
+
+	strings.Map, strings.Join, strings.Count, strings.Repeat, strings.Compare, strings.Replace, strings.EqualFold,
+	strings.ToLower, strings.ToUpper, strings.Fields, strings.FieldsFunc, strings.SplitN, strings.SplitAfterN,
+	strings.HasPrefix, strings.HasSuffix, strings.Contains, strings.ContainsAny,
+	strings.Index, strings.IndexAny, strings.IndexFunc, strings.LastIndex, strings.LastIndexAny, strings.LastIndexFunc,
+	strings.Trim, strings.TrimFunc, strings.TrimPrefix, strings.TrimSuffix,
+	strings.TrimLeft, strings.TrimLeftFunc, strings.TrimRight, strings.TrimRightFunc,
+
+	suffixarray.New, suffixarray.Index{},
+
+	prt, prf,
+	s2i, i2s, b2i, isNumber, isLetter, isLower, isUpper, toLower, toUpper,
+	abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor,
+	vct, mtx, cb, vctBool, mtxBool, cbBool,
+	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
+	sz, fd, all, anyOne, lb, ub, cnt, idxSort,
+	drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort,
+	pair{}, triplet{}, vector{}, text{},
+	heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{},
+	hp, tm, ts, mts, hs, dq,
+}
 
 const mod int = 1e9 + 7
 
