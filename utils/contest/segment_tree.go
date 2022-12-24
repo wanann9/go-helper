@@ -57,6 +57,9 @@ func (t *segmentTree) calc(x, y int) int {
 }
 
 func (t *segmentTree) calc2(i, l, r, x, y int) (rst int) {
+	if x > y {
+		return
+	}
 	if x <= l && y >= r {
 		return t.nodes[i].f + t.nodes[i].v*(r-l+1)
 	}
@@ -82,4 +85,75 @@ func (t *segmentTree) down(i, i1, i2, l, m, r int) {
 
 func (t *segmentTree) up(i, i1, i2, l, m, r int) {
 	t.nodes[i].f = t.nodes[i1].f + t.nodes[i1].v*(m-l+1) + t.nodes[i2].f + t.nodes[i2].v*(r-m)
+}
+
+type segmentTree2 struct {
+	*smtNode2
+}
+
+type smtNode2 struct {
+	l, r        int
+	left, right *smtNode2
+	f, v        int
+}
+
+func smt2(l, r int) *segmentTree2 {
+	return &segmentTree2{&smtNode2{l: l, r: r}}
+}
+
+func (t *smtNode2) update(x, y, k int) {
+	if x <= t.l && y >= t.r {
+		t.v += k
+		return
+	}
+	t.grow()
+	t.down()
+	if x <= t.left.r {
+		t.left.update(x, y, k)
+	}
+	if y >= t.right.l {
+		t.right.update(x, y, k)
+	}
+	t.up()
+}
+
+func (t *smtNode2) calc(x, y int) (rst int) {
+	if x > y {
+		return
+	}
+	if x <= t.l && y >= t.r {
+		return t.f + t.v*(t.r-t.l+1)
+	}
+	t.grow()
+	t.down()
+	if x <= t.left.r {
+		rst += t.left.calc(x, y)
+	}
+	if y >= t.right.l {
+		rst += t.right.calc(x, y)
+	}
+	t.up()
+	return
+}
+
+func (t *smtNode2) grow() {
+	m := t.l + (t.r-t.l)>>1
+	if t.left == nil {
+		t.left = &smtNode2{l: t.l, r: m}
+	}
+	if t.right == nil {
+		t.right = &smtNode2{l: m + 1, r: t.r}
+	}
+}
+
+func (t *smtNode2) down() {
+	if t.v != 0 {
+		t.left.v += t.v
+		t.right.v += t.v
+		t.v = 0
+	}
+}
+
+func (t *smtNode2) up() {
+	t.f = t.left.f + t.left.v*(t.left.r-t.left.l+1) + t.right.f + t.right.v*(t.right.r-t.right.l+1)
 }

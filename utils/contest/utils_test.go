@@ -218,12 +218,12 @@ func Test_treeMap(t *testing.T) {
 		m.Put(n, 10-n)
 	}
 	t.Log(m.Left(), m.Right())
-	it := m.iteratorAt(m.Left())
-	for it.prev(); it.next(); {
-		t.Log(it.key(), it.value())
+	it := m.IteratorAt(m.Left())
+	for it.Prev(); it.Next(); {
+		t.Log(it.Key(), it.Value())
 	}
-	for it.prev() {
-		t.Log(it.key(), it.value())
+	for it.Prev() {
+		t.Log(it.Key(), it.Value())
 	}
 }
 
@@ -254,4 +254,9 @@ func Test_hashSet(t *testing.T) {
 	t.Log(s1.intersection(s2))
 	t.Log(s1.union(s2))
 	t.Log(s1.difference(s2))
+}
+
+func Test_idxSort(t *testing.T) {
+	a := []int{1, 3, 2, 4}
+	t.Log(idxSort(4, func(i, j int) bool { return a[i] < a[j] }))
 }
