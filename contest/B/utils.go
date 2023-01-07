@@ -340,6 +340,23 @@ func idxSort(n int, less func(i, j int) bool) []int {
 	return rst
 }
 
+// lis 返回以nums[i]为结尾的最长递增子序列长度
+func lis(nums []int) []int {
+	n := len(nums)
+	rst := vct(n, 0)
+	var a []int
+	for i, num := range nums {
+		j := lb(-1, len(a), func(j int) bool { return a[j] >= num })
+		rst[i] = j + 1
+		if j == len(a) {
+			a = append(a, num)
+		} else {
+			a[j] = num
+		}
+	}
+	return rst
+}
+
 var (
 	drt  = []pair{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
 	drt2 = []pair{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
@@ -1535,7 +1552,7 @@ var _ = []interface{}{
 	abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
-	sz, fd, all, anyOne, lb, ub, cnt, idxSort,
+	sz, fd, all, anyOne, lb, ub, cnt, idxSort, lis,
 	drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort,
 	pair{}, triplet{}, vector{}, text{},
 	heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{},

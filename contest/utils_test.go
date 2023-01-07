@@ -260,3 +260,7 @@ func Test_idxSort(t *testing.T) {
 	a := []int{1, 3, 2, 4}
 	t.Log(idxSort(4, func(i, j int) bool { return a[i] < a[j] }))
 }
+
+func Test_lis(t *testing.T) {
+	t.Log(lis([]int{0, 4, 2, 1, 5, 3, 6, 8, 7, 9}))
+}
