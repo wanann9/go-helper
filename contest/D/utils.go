@@ -107,10 +107,10 @@ func pow(a, b, mod int) (rst int) {
 }
 
 func gcd(a, b int) int {
-	if a%b == 0 {
-		return b
+	for b != 0 {
+		a, b = b, a%b
 	}
-	return gcd(b, a%b)
+	return a
 }
 
 func lcm(a, b int) int {
