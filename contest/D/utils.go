@@ -131,16 +131,28 @@ func initC(n, mod int) {
 	}
 }
 
-func isPrime(n int) bool {
-	if n <= 1 {
-		return false
-	}
-	for i := 2; i*i <= n; i++ {
-		if n%i == 0 {
-			return false
+var (
+	isPrime []bool
+	primes  []int
+)
+
+func initPrime(n int) {
+	isPrime = vctBool(n+1, true)
+	isPrime[0], isPrime[1] = false, false
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			primes = append(primes, i)
+		}
+		for _, p := range primes {
+			if p*i > n {
+				break
+			}
+			isPrime[p*i] = false
+			if i%p == 0 {
+				break
+			}
 		}
 	}
-	return true
 }
 
 func factor(n int) map[int]int {
@@ -1549,7 +1561,7 @@ var _ = []interface{}{
 
 	prt, prf,
 	s2i, i2s, b2i, isNumber, isLetter, isLower, isUpper, toLower, toUpper,
-	abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor,
+	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
 	sz, fd, all, anyOne, lb, ub, cnt, idxSort, lis,
@@ -1573,4 +1585,5 @@ const mod int = 1e9 + 7
 
 //func init() {
 //	initC(1000, 0)
+//	initPrime(1e6)
 //}

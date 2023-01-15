@@ -167,15 +167,10 @@ func Test_c(t *testing.T) {
 	t.Log(c)
 }
 
-func Test_isPrime(t *testing.T) {
-	type args struct {
-		n int
-	}
-	for _, a := range []*args{
-		{0}, {1}, {2}, {3}, {4}, {1 << 30},
-	} {
-		t.Log(isPrime(a.n))
-	}
+func Test_prime(t *testing.T) {
+	initPrime(100)
+	t.Log(isPrime)
+	t.Log(primes)
 }
 
 func Test_factor(t *testing.T) {
