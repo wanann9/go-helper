@@ -167,15 +167,10 @@ func Test_c(t *testing.T) {
 	t.Log(c)
 }
 
-func Test_isPrime(t *testing.T) {
-	type args struct {
-		n int
-	}
-	for _, a := range []*args{
-		{0}, {1}, {2}, {3}, {4}, {1 << 30},
-	} {
-		t.Log(isPrime(a.n))
-	}
+func Test_prime(t *testing.T) {
+	initPrime(100)
+	t.Log(isPrime)
+	t.Log(primes)
 }
 
 func Test_factor(t *testing.T) {
@@ -259,4 +254,8 @@ func Test_hashSet(t *testing.T) {
 func Test_idxSort(t *testing.T) {
 	a := []int{1, 3, 2, 4}
 	t.Log(idxSort(4, func(i, j int) bool { return a[i] < a[j] }))
+}
+
+func Test_lis(t *testing.T) {
+	t.Log(lis([]int{0, 4, 2, 1, 5, 3, 6, 8, 7, 9}))
 }

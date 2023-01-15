@@ -107,10 +107,10 @@ func pow(a, b, mod int) (rst int) {
 }
 
 func gcd(a, b int) int {
-	if a%b == 0 {
-		return b
+	for b != 0 {
+		a, b = b, a%b
 	}
-	return gcd(b, a%b)
+	return a
 }
 
 func lcm(a, b int) int {
@@ -131,16 +131,28 @@ func initC(n, mod int) {
 	}
 }
 
-func isPrime(n int) bool {
-	if n <= 1 {
-		return false
-	}
-	for i := 2; i*i <= n; i++ {
-		if n%i == 0 {
-			return false
+var (
+	isPrime []bool
+	primes  []int
+)
+
+func initPrime(n int) {
+	isPrime = vctBool(n+1, true)
+	isPrime[0], isPrime[1] = false, false
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			primes = append(primes, i)
+		}
+		for _, p := range primes {
+			if p*i > n {
+				break
+			}
+			isPrime[p*i] = false
+			if i%p == 0 {
+				break
+			}
 		}
 	}
-	return true
 }
 
 func factor(n int) map[int]int {
@@ -337,6 +349,23 @@ func idxSort(n int, less func(i, j int) bool) []int {
 		rst[i] = i
 	}
 	sort.Slice(rst, func(i, j int) bool { return less(rst[i], rst[j]) })
+	return rst
+}
+
+// lis 返回以nums[i]为结尾的最长递增子序列长度
+func lis(nums []int) []int {
+	n := len(nums)
+	rst := vct(n, 0)
+	var a []int
+	for i, num := range nums {
+		j := lb(-1, len(a), func(j int) bool { return a[j] >= num })
+		rst[i] = j + 1
+		if j == len(a) {
+			a = append(a, num)
+		} else {
+			a[j] = num
+		}
+	}
 	return rst
 }
 
@@ -1532,10 +1561,10 @@ var _ = []interface{}{
 
 	prt, prf,
 	s2i, i2s, b2i, isNumber, isLetter, isLower, isUpper, toLower, toUpper,
-	abs, min, max, pow, gcd, lcm, c, initC, isPrime, factor,
+	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
-	sz, fd, all, anyOne, lb, ub, cnt, idxSort,
+	sz, fd, all, anyOne, lb, ub, cnt, idxSort, lis,
 	drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort,
 	pair{}, triplet{}, vector{}, text{},
 	heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{},
@@ -1556,4 +1585,5 @@ const mod int = 1e9 + 7
 
 //func init() {
 //	initC(1000, 0)
+//	initPrime(1e6)
 //}
