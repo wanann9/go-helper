@@ -294,7 +294,7 @@ func fd(l, r, i int, check func(int) bool) int {
 	return -1
 }
 
-func all(l, r int, check func(int) bool) bool {
+func al(l, r int, check func(int) bool) bool {
 	for i := l; i <= r; i++ {
 		if !check(i) {
 			return false
@@ -303,7 +303,7 @@ func all(l, r int, check func(int) bool) bool {
 	return true
 }
 
-func anyOne(l, r int, check func(int) bool) bool {
+func an(l, r int, check func(int) bool) bool {
 	for i := l; i <= r; i++ {
 		if check(i) {
 			return true
@@ -1564,7 +1564,7 @@ var _ = []interface{}{
 	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
-	sz, fd, all, anyOne, lb, ub, cnt, idxSort, lis,
+	sz, fd, al, an, lb, ub, cnt, idxSort, lis,
 	drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort,
 	pair{}, triplet{}, vector{}, text{},
 	heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{},
