@@ -343,6 +343,13 @@ func cnt(l, r, i int, check func(int) bool) (rst int) {
 	return
 }
 
+func sm(l, r int, key func(int) int) (rst int) {
+	for i := l; i <= r; i++ {
+		rst += key(i)
+	}
+	return
+}
+
 func idxSort(n int, less func(i, j int) bool) []int {
 	rst := vct(n, 0)
 	for i := range rst {
@@ -1564,7 +1571,7 @@ var _ = []interface{}{
 	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
-	sz, fd, al, an, lb, ub, cnt, idxSort, lis,
+	sz, fd, al, an, lb, ub, cnt, sm, idxSort, lis,
 	drt, drt2, srd, in, ug, dg, child, dijkstra, tpSort,
 	pair{}, triplet{}, vector{}, text{},
 	heap{}, treeMap{}, treeSet{}, multiSet{}, hashSet{}, deque{},
