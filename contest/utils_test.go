@@ -184,6 +184,17 @@ func Test_factor(t *testing.T) {
 	}
 }
 
+func Test_flatten(t *testing.T) {
+	type args struct {
+		n int
+	}
+	for _, a := range []*args{
+		{0}, {123},
+	} {
+		t.Log(flatten(a.n))
+	}
+}
+
 func Test_text_split(t *testing.T) {
 	type args struct {
 		s, charSet string

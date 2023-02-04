@@ -168,6 +168,15 @@ func factor(n int) map[int]int {
 	return rst
 }
 
+func flatten(n int) []int {
+	s := i2s(n, 10)
+	rst := vct(len(s), 0)
+	for i, c := range s {
+		rst[i] = int(c - '0')
+	}
+	return rst
+}
+
 func vct(l, init int) []int {
 	v := make([]int, l)
 	if init != 0 {
@@ -1568,7 +1577,7 @@ var _ = []interface{}{
 
 	prt, prf,
 	s2i, i2s, b2i, isNumber, isLetter, isLower, isUpper, toLower, toUpper,
-	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor,
+	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor, flatten,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
 	sz, fd, al, an, lb, ub, cnt, sm, idxSort, lis,
