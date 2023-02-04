@@ -195,17 +195,6 @@ func Test_flatten(t *testing.T) {
 	}
 }
 
-func Test_text_split(t *testing.T) {
-	type args struct {
-		s, charSet string
-	}
-	for _, a := range []*args{
-		{"0, 1 23", " ,"},
-	} {
-		t.Log(text(a.s).split(a.charSet))
-	}
-}
-
 func Test_srd(t *testing.T) {
 	type args struct {
 		m, n, i, j int

@@ -585,24 +585,6 @@ func (t text) sort(cmp utils.Comparator, stable bool) text {
 	return t
 }
 
-func (t text) split(charSet string) (rst []string) {
-	var m [256]bool
-	for _, c := range text(charSet) {
-		m[c] = true
-	}
-	i := -1
-	for j, c := range append(t, charSet[0]) {
-		if !m[c] {
-			continue
-		}
-		if j > i+1 {
-			rst = append(rst, string(t[i+1:j]))
-		}
-		i = j
-	}
-	return
-}
-
 func (t text) counts() (rst [256]int) {
 	for _, c := range t {
 		rst[c]++
