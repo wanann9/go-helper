@@ -171,16 +171,20 @@ func Test_prime(t *testing.T) {
 	initPrime(100)
 	t.Log(isPrime)
 	t.Log(primes)
+	t.Log(minFactor)
 }
 
 func Test_factor(t *testing.T) {
+	initPrime(12)
 	type args struct {
-		n int
+		n         int
+		minFactor []int
 	}
 	for _, a := range []*args{
-		{0}, {1}, {2}, {12}, {1 << 30},
+		{0, nil}, {1, nil}, {2, nil}, {12, nil}, {1 << 30, nil},
+		{0, minFactor}, {1, minFactor}, {2, minFactor}, {12, minFactor},
 	} {
-		t.Log(factor(a.n))
+		t.Log(factor(a.n, a.minFactor))
 	}
 }
 

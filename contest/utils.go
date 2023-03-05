@@ -132,22 +132,25 @@ func initC(n, mod int) {
 }
 
 var (
-	isPrime []bool
-	primes  []int
+	isPrime   []bool
+	primes    []int
+	minFactor []int
 )
 
 func initPrime(n int) {
-	isPrime = vctBool(n+1, true)
+	isPrime, minFactor = vctBool(n+1, true), vct(n+1, 0)
 	isPrime[0], isPrime[1] = false, false
 	for i := 2; i <= n; i++ {
 		if isPrime[i] {
 			primes = append(primes, i)
+			minFactor[i] = i
 		}
 		for _, p := range primes {
 			if p*i > n {
 				break
 			}
 			isPrime[p*i] = false
+			minFactor[p*i] = p
 			if i%p == 0 {
 				break
 			}
@@ -155,8 +158,15 @@ func initPrime(n int) {
 	}
 }
 
-func factor(n int) map[int]int {
+func factor(n int, minFactor []int) map[int]int {
 	rst := make(map[int]int)
+	if minFactor != nil {
+		for f := 0; n > 1; n /= f {
+			f = minFactor[n]
+			rst[f]++
+		}
+		return rst
+	}
 	for i := 2; i*i <= n; i++ {
 		for ; n%i == 0; n /= i {
 			rst[i]++
@@ -1559,7 +1569,7 @@ var _ = []interface{}{
 
 	prt, prf,
 	s2i, i2s, b2i, isNumber, isLetter, isLower, isUpper, toLower, toUpper,
-	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, initPrime, factor, flatten,
+	abs, min, max, pow, gcd, lcm, c, initC, isPrime, primes, minFactor, initPrime, factor, flatten,
 	vct, mtx, cb, vctBool, mtxBool, cbBool,
 	cmpInt, cmpInt64, cmpUint, cmpUint64, cmpByte, cmpRune, cmpFloat64, cmpBool, cmpString, cmpPair, cmpTriplet, rvsCmp,
 	sz, fd, al, an, lb, ub, cnt, sm, idxSort, lis,
